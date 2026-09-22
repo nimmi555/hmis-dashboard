@@ -1768,83 +1768,102 @@ if is_admin:
                     "Apr-2026", "May-2026", "Jun-2026", "Jul-2026", "Aug-2026", "Sep-2026", 
                     "Oct-2026", "Nov-2026", "Dec-2026", "Jan-2027", "Feb-2027", "Mar-2027"
                 ]
-                upload_month = st.selectbox("Select Month for Upload:", upload_months)
+                # Changed to multi-select to support updating multiple months safely
+                selected_upload_months = st.multiselect("Select Target Month(s) for Upload:", upload_months, default=["Apr-2026"])
             
-            st.warning(f"⚠️ **Target Month:** You are uploading data for **{upload_month} ({upload_fy})**. This action will **DELETE** any existing old data for this specific month and replace it with these new files.")
+            st.warning(f"⚠️ **Target Months:** You are uploading data for **{', '.join(selected_upload_months)} ({upload_fy})**. This action will **DELETE** any existing old data for these specific months and replace it with these new files.")
             
-            # --- THE FIX: FORCE REBUILD CHECKBOX ---
-            force_rebuild = st.checkbox("⚠️ Force Database Reset (Check this box to permanently fix the 'Missing Columns' error by wiping the corrupted schema)", value=True)
+            # --- THE FIX: FORCE REBUILD CHECKBOX (Defaulted to False for safety) ---
+            force_rebuild = st.checkbox("⚠️ Force Database Reset (Check this box ONLY to permanently wipe the database and start over)", value=False)
             
             uploaded_files = st.file_uploader("Upload raw monthly/annual HMIS data files (CSV/Excel)", type=["csv", "xlsx"], accept_multiple_files=True)
             
             if uploaded_files:
                 if st.button("🚀 Process & Replace Database", type="primary"):
-                    with st.spinner("Processing massive dataset... please wait."):
-                        success_count = 0
-                        
-                        for file in uploaded_files:
-                            try:
-                                # 1. Read the file
-                                if file.name.endswith('.csv'):
-                                    df_raw = pd.read_csv(file, low_memory=False)
-                                else:
-                                    df_raw = pd.read_excel(file)
-                                
-                                # --- DATA SANITIZER FOR HEADERS ---
-                                import re
-                                def clean_header(col_name):
-                                    c = str(col_name).replace('\xa0', ' ') # Destroy hidden ghost spaces
-                                    c = c.strip() # Remove invisible trailing/leading spaces
-                                    c = re.sub(r'\s+', ' ', c) # Fix accidental double-spaces
-                                    return c
-                                
-                                df_raw.columns = [clean_header(c) for c in df_raw.columns]
-                                # -------------------------------------------
-                                
-                                # 2. Add required metadata variables
-                                df_raw['Financial_Year'] = upload_fy
-                                df_raw['Month'] = upload_month
-                                
-                                # 3. Convert Facility Code to string
-                                if 'Facility Code' in df_raw.columns:
-                                    df_raw['Facility Code'] = df_raw['Facility Code'].astype(str)
-                                
-                                # 4. Smart Database Merge Logic
+                    if not selected_upload_months:
+                        st.error("❌ Please select at least one Target Month from the dropdown.")
+                    else:
+                        with st.spinner("Processing massive dataset... please wait."):
+                            success_count = 0
+                            
+                            for file in uploaded_files:
                                 try:
-                                    # If the user checked the reset box, blow up the old dirty table
-                                    if force_rebuild and success_count == 0:
-                                        con.execute("DROP TABLE IF EXISTS hmis_master_data")
-                                        
-                                    current_cols = con.execute("DESCRIBE hmis_master_data").fetchdf()
+                                    # Memory-safe file reading via local hard drive buffer
+                                    temp_file_path = f"temp_{file.name}"
+                                    with open(temp_file_path, "wb") as f:
+                                        f.write(file.getbuffer())
                                     
-                                    # Blow up the old fake mock table if it exists (fewer than 50 columns)
-                                    if len(current_cols) < 50:
-                                        con.execute("DROP TABLE IF EXISTS hmis_master_data")
-                                        con.execute("CREATE TABLE hmis_master_data AS SELECT * FROM df_raw")
+                                    if temp_file_path.endswith('.csv'):
+                                        df_raw = pd.read_csv(temp_file_path)
                                     else:
-                                        # If this is the FIRST file in the loop, wipe the target month first
-                                        if success_count == 0:
-                                            con.execute("DELETE FROM hmis_master_data WHERE Financial_Year = ? AND Month = ?", [upload_fy, upload_month])
+                                        df_raw = pd.read_excel(temp_file_path)
+                                        
+                                    import os
+                                    if os.path.exists(temp_file_path):
+                                        os.remove(temp_file_path)
+                                    
+                                    # --- DATA SANITIZER FOR HEADERS ---
+                                    import re
+                                    def clean_header(col_name):
+                                        c = str(col_name).replace('\xa0', ' ') # Destroy hidden ghost spaces
+                                        c = c.strip() # Remove invisible trailing/leading spaces
+                                        c = re.sub(r'\s+', ' ', c) # Fix accidental double-spaces
+                                        return c
+                                    
+                                    df_raw.columns = [clean_header(c) for c in df_raw.columns]
+                                    # -------------------------------------------
+                                    
+                                    # 2. Add required metadata variables
+                                    df_raw['Financial_Year'] = upload_fy
+                                    
+                                    # Assign month logic: if single month selected, apply it; if multiple, expect file to have its own Month column
+                                    if len(selected_upload_months) == 1:
+                                        df_raw['Month'] = selected_upload_months[0]
+                                    elif 'Month' not in df_raw.columns:
+                                        st.error(f"❌ Error: {file.name} does not contain a 'Month' column, but you selected multiple target months. Please upload files individually or ensure a Month column is present.")
+                                        continue
+                                    
+                                    # 3. Convert Facility Code to string
+                                    if 'Facility Code' in df_raw.columns:
+                                        df_raw['Facility Code'] = df_raw['Facility Code'].astype(str)
+                                    
+                                    # 4. Smart Database Merge Logic
+                                    try:
+                                        # If the user explicitly checked the full reset box on the first file
+                                        if force_rebuild and success_count == 0:
+                                            con.execute("DROP TABLE IF EXISTS hmis_master_data")
                                             
-                                        db_columns = con.execute("SELECT * FROM hmis_master_data LIMIT 0").fetchdf().columns
-                                        for col in db_columns:
-                                            if col not in df_raw.columns:
-                                                df_raw[col] = None 
-                                        df_raw = df_raw[db_columns]
-                                        con.execute("INSERT INTO hmis_master_data SELECT * FROM df_raw")
+                                        current_cols = con.execute("DESCRIBE hmis_master_data").fetchdf()
                                         
+                                        # Blow up old mock table if it exists (fewer than 50 columns)
+                                        if len(current_cols) < 50:
+                                            con.execute("DROP TABLE IF EXISTS hmis_master_data")
+                                            con.execute("CREATE TABLE hmis_master_data AS SELECT * FROM df_raw")
+                                        else:
+                                            # If this is the first file in the loop, safely wipe ONLY the targeted months
+                                            if success_count == 0 and not force_rebuild:
+                                                for target_mo in selected_upload_months:
+                                                    con.execute("DELETE FROM hmis_master_data WHERE Financial_Year = ? AND Month = ?", [upload_fy, target_mo])
+                                            
+                                            db_columns = con.execute("SELECT * FROM hmis_master_data LIMIT 0").fetchdf().columns
+                                            for col in db_columns:
+                                                if col not in df_raw.columns:
+                                                    df_raw[col] = None 
+                                            df_raw = df_raw[db_columns]
+                                            con.execute("INSERT INTO hmis_master_data SELECT * FROM df_raw")
+                                            
+                                    except Exception as e:
+                                        # If table completely doesn't exist, create it cleanly!
+                                        con.execute("CREATE TABLE hmis_master_data AS SELECT * FROM df_raw")
+                                        
+                                    success_count += 1
                                 except Exception as e:
-                                    # If table completely doesn't exist, create it cleanly!
-                                    con.execute("CREATE TABLE hmis_master_data AS SELECT * FROM df_raw")
-                                        
-                                success_count += 1
-                            except Exception as e:
-                                st.error(f"❌ Error processing {file.name}: {e}")
+                                    st.error(f"❌ Error processing {file.name}: {e}")
                         
-                        if success_count > 0:
-                            st.success(f"✅ Successfully processed {success_count} new file(s) for {upload_month} into the Master Database! (Columns matched: {len(df_raw.columns)})")
-                            st.balloons()
-                            st.cache_data.clear()
+                            if success_count > 0:
+                                st.success(f"✅ Successfully processed {success_count} new file(s) into the Master Database! (Columns matched: {len(df_raw.columns)})")
+                                st.balloons()
+                                st.cache_data.clear()
 
         elif admin_action == "🧮 Add New Rule":
             st.markdown("### 🛠️ Advanced Formula Engine")
