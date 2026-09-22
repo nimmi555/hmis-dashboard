@@ -1470,9 +1470,9 @@ if is_admin:
                     for file in uploaded_files:
                         try:
                         # 1. Save file to the server's hard drive to bypass web memory limits
-                        temp_file_path = f"temp_{file.name}"
-                        with open(temp_file_path, "wb") as f:
-                            f.write(file.getbuffer())
+                            temp_file_path = f"temp_{file.name}"
+                            with open(temp_file_path, "wb") as f:
+                                f.write(file.getbuffer())
                         
                         # 2. Read from the hard drive (removed low_memory=False to save RAM)
                         df_raw = pd.read_csv(temp_file_path) if temp_file_path.endswith(".csv") \
