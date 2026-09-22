@@ -1260,7 +1260,7 @@ def show_drilldown_modal(selected_anomaly, raw_df, financial_year, selected_mont
                 detailed_df['RHS Value'] = detailed_df.eval(eval_rhs)
                 detailed_df['Difference (LHS - RHS)'] = detailed_df['LHS Value'] - detailed_df['RHS Value']
                 
-                base_cols = ["Month", "District Name", "Format Type", "Facility Code", "Facility Name"]
+                base_cols = ["Month", "District Name", "Sub District Name", "Format Type", "Facility Code", "Facility Name"]
                 display_cols = [c for c in base_cols if c in detailed_df.columns] + metrics_in_rule + ['Difference (LHS - RHS)']
                 
                 drill_final = detailed_df[display_cols].copy()
