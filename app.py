@@ -1176,7 +1176,8 @@ with tab_mom:
             
             st.markdown("### 📊 Trend Abstract")
             gridOptions_mom = build_grid_options(mom_abstract)
-            AgGrid(mom_abstract, gridOptions=gridOptions_mom, theme='alpine', custom_css=shared_custom_css, fit_columns_on_grid_load=True, height=300)
+            # Added key="mom_abstract_grid"
+            AgGrid(mom_abstract, gridOptions=gridOptions_mom, theme='alpine', custom_css=shared_custom_css, fit_columns_on_grid_load=True, height=300, key="mom_abstract_grid")
             
             st.markdown("### 🎯 Detailed Facility Trend Log")
             mom_details = mom_anomalies_df.copy()
@@ -1188,7 +1189,8 @@ with tab_mom:
                 elif col['field'] == 'Details': col['minWidth'], col['wrapText'], col['autoHeight'] = 300, True, True
                 elif col['field'] not in ["Month", "District Name", "Facility Code"]: col['filter'] = False
                 
-            AgGrid(mom_details, gridOptions=gridOptions_mom_det, theme='alpine', custom_css=shared_custom_css, fit_columns_on_grid_load=False, height=500)
+            # Added key="mom_details_grid"
+            AgGrid(mom_details, gridOptions=gridOptions_mom_det, theme='alpine', custom_css=shared_custom_css, fit_columns_on_grid_load=False, height=500, key="mom_details_grid")
             
             csv_mom = mom_details.to_csv(index=False).encode('utf-8')
             st.download_button("📥 Download Trend Data", data=csv_mom, file_name="MoM_Trend_Anomalies.csv", mime="text/csv", type="primary")
