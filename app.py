@@ -1478,9 +1478,19 @@ if is_admin:
                                         st.error(f"❌ Upload aborted for {file.name}: No 'Month' column found.")
                                         continue
                                         
-                                    # --- THE DATE FORMAT FIX ---
-                                    # This forces Excel dates (like 26-Jul) into your strict Drive format (Jul-2026)
-                                    df['Month'] = pd.to_datetime(df['Month']).dt.strftime('%b-%Y')
+                                    # --- THE BULLETPROOF DATE FORMAT FIX ---
+                                    # 1. Rip out exactly 3 letters for the month (ignores the "26-" entirely)
+                                    month_names = df['Month'].astype(str).str.extract(r'([A-Za-z]{3})')[0].str.capitalize()
+                                    
+                                    # 2. Lock the year directly to your selected Financial Year (e.g., 2026-27)
+                                    fy_start = int(upload_fy.split('-')[0])
+                                    month_to_num = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12}
+                                    
+                                    # Jan-Mar get next year (2027), Apr-Dec get base year (2026)
+                                    years = month_names.map(month_to_num).apply(lambda m: fy_start + 1 if m <= 3 else fy_start)
+                                    
+                                    # 3. Stitch them together perfectly (e.g., Apr-2026)
+                                    df['Month'] = month_names + '-' + years.astype(str)
                                         
                                     df['Financial_Year'] = upload_fy
                                     if 'Facility Code' in df.columns:
