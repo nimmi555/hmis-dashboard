@@ -1406,7 +1406,7 @@ if is_admin:
     with tabs[7]:
         st.subheader("🔒 State Admin & Database Access")
         
-        admin_action = st.radio("Select Action", ["🧮 Add New Rule", "✏️ Edit/Delete Rule", "📤 Upload HMIS Data", "🔑 Change Password"], horizontal=True)
+        admin_action = st.radio("Select Action", ["🧮 Add New Rule", "✏️ Edit/Delete Rule", "📤 Upload HMIS Data"], horizontal=True)
         st.divider()
         
         if admin_action == "📤 Upload HMIS Data":
@@ -1827,31 +1827,3 @@ if is_admin:
                             except Exception as e:
                                 st.error(f"Error deleting rule: {e}")
             render_edit_rule()
-
-        elif admin_action == "🔑 Change Password":
-            @st.fragment
-            def render_change_password():
-                st.markdown("### 🔑 Change Admin Password")
-                
-                with st.form("change_password_form"):
-                    old_pwd = st.text_input("Current Password", type="password")
-                    new_pwd = st.text_input("New Password", type="password")
-                    confirm_pwd = st.text_input("Confirm New Password", type="password")
-                    
-                    st.write("")
-                    submit_pwd = st.form_submit_button("💾 Update Password", type="primary")
-                    
-                    if submit_pwd:
-                        if old_pwd != current_db_password:
-                            st.error("❌ Current password is incorrect.")
-                        elif new_pwd != confirm_pwd:
-                            st.error("❌ New passwords do not match.")
-                        elif len(new_pwd) < 5:
-                            st.error("❌ Password must be at least 5 characters long.")
-                        else:
-                            try:
-                                con_rules.execute("UPDATE admin_settings SET setting_value = ? WHERE setting_name = 'admin_password'", [new_pwd])
-                                st.success("✅ Password updated successfully! Please re-enter your new password in the sidebar to keep Admin access.")
-                            except Exception as e:
-                                st.error(f"Database error: {e}")
-            render_change_password()
