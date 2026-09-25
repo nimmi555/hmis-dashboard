@@ -1411,43 +1411,37 @@ if is_admin:
         
         if admin_action == "📤 Upload HMIS Data":
             
-            # --- BRAND NEW FUNCTION TO BREAK THE CACHE ---
+            # --- QUOTA-BYPASS UPLOAD FUNCTION ---
             def force_drive_sync(file_buffer, file_name, mime_type):
-                """Bypasses Google API indexing delays by forcing the upload with visibility flags."""
+                """Bypasses Service Account quota limits by UPDATING an existing user-owned file."""
                 from googleapiclient.http import MediaIoBaseUpload
                 service = get_gdrive_service()
+                folder_id = "1TK3CsZc_9xday99mBbYoLQCMBuVLrznQ"
                 
-                # Stripping any accidental invisible spaces
-                folder_id = "1TK3CsZc_9xday99mBbYoLQCMBuVLrznQ".strip()
+                # 1. Search for the existing file
+                query = f"name='{file_name}' and '{folder_id}' in parents and trashed=false"
+                results = service.files().list(
+                    q=query, 
+                    fields="files(id)",
+                    includeItemsFromAllDrives=True, 
+                    supportsAllDrives=True
+                ).execute()
                 
-                # 1. Search and delete (with forced visibility flags)
-                try:
-                    query = f"name='{file_name}' and '{folder_id}' in parents and trashed=false"
-                    results = service.files().list(
-                        q=query, 
-                        fields="files(id)",
-                        includeItemsFromAllDrives=True, 
-                        supportsAllDrives=True
-                    ).execute()
-                    
-                    for existing in results.get('files', []):
-                        service.files().delete(
-                            fileId=existing['id'],
-                            supportsAllDrives=True
-                        ).execute()
-                except Exception:
-                    pass # Ignore false 404 errors during search
+                items = results.get('files', [])
                 
-                # 2. Force the file creation (WITH THE BYPASS FLAGS)
-                file_metadata = {'name': file_name, 'parents': [folder_id]}
+                if not items:
+                    # If the file doesn't exist, tell the admin exactly what to create
+                    raise Exception(f"⚠️ QUOTA LOCK: Please create a blank file named exactly '{file_name}' and drop it into your Drive folder first. Then upload again!")
+                
+                # 2. File exists! The robot will UPDATE it (Using YOUR quota, not the robot's)
+                file_id = items[0]['id']
                 media = MediaIoBaseUpload(file_buffer, mimetype=mime_type, resumable=True)
                 
-                # We must tell the API to look outside the robot's personal drive to find your folder
-                uploaded_file = service.files().create(
-                    body=file_metadata, 
+                uploaded_file = service.files().update(
+                    fileId=file_id, 
                     media_body=media, 
-                    fields='id',
-                    supportsAllDrives=True
+                    supportsAllDrives=True,
+                    fields='id'
                 ).execute()
                 
                 return uploaded_file.get('id')
@@ -1507,6 +1501,7 @@ if is_admin:
                                     st.error(f"❌ Failed processing {file.name}: {e}")
                                     
             render_upload_data()
+            
         elif admin_action == "🧮 Add New Rule":
             @st.fragment
             def render_add_rule():
