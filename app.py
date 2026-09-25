@@ -419,6 +419,9 @@ if search_triggered:
 st.sidebar.markdown("---")
 admin_password = st.sidebar.text_input("🔒 Admin Access", type="password", help="Enter master password to unlock Admin tab")
 
+# Check if the typed password matches the one in your Secrets vault
+is_admin = (admin_password == st.secrets["admin_password"])
+
 # Fetch current password directly from the database
 try:
     current_db_password = con_rules.execute("SELECT setting_value FROM admin_settings WHERE setting_name = 'admin_password'").fetchone()[0]
