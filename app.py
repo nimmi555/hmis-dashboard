@@ -15,21 +15,6 @@ from github import Github
 # 1. PAGE CONFIGURATION (Must be the absolute first Streamlit command)
 st.set_page_config(page_title="HMIS Anomalies", layout="wide", initial_sidebar_state="expanded")
 
-# 2. SAFE CSS INJECTION (Leaves Sidebar Intact)
-hide_streamlit_style = """
-            <style>
-            /* Gently pulls the dashboard up without breaking the sidebar controls */
-            .block-container {
-                padding-top: 1rem !important;
-            }
-            
-            /* Hides only the top-right hamburger menu and bottom footer */
-            [data-testid="stToolbar"] {visibility: hidden !important;}
-            footer {visibility: hidden !important;}
-            </style>
-            """
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-
 # 3. CACHING FUNCTION & DATA LOADING (Moved safely below the page config)
 @st.cache_data
 def load_indicator_list():
@@ -1139,7 +1124,7 @@ with tab2:
             
             # --- TAB 2: GRAND TOTAL BAR ---
             tab2_total = abstract_df['Anomaly Count'].sum()
-            st.markdown(f'<div style="background-color: #ff9800; color: #000; font-weight: 900; font-size: 16px; padding: 12px; border-radius: 5px; display: flex; justify-content: space-between; margin-top: 10px;"><span>Grand Total Anomalies</span><span>{tab2_total:,}</span></div>', unsafe_allow_html=True)
+            st.markdown(f'<div style="background-color: #ff9800; color: #000; font-weight: 900; font-size: 16px; padding: 12px; border-radius: 5px; display: flex; justify-content: flex-start; gap: 15px; margin-top: 10px;"><span>Grand Total Anomalies:</span><span style="background-color: white; padding: 0px 10px; border-radius: 3px; color: red;">{tab2_total:,}</span></div>', unsafe_allow_html=True)
             
             # --- TRIGGER POPUP MODAL ON ROW CLICK (WITH ANTI-HAUNTING LOCK) ---
             sel_rows = response.get('selected_rows')
