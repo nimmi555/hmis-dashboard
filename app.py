@@ -15,19 +15,15 @@ from github import Github
 # 1. PAGE CONFIGURATION (Must be the absolute first Streamlit command)
 st.set_page_config(page_title="HMIS Anomalies", layout="wide", initial_sidebar_state="expanded")
 
-# 2. MODERN CLEAN UI CSS INJECTION (Upgraded Layout Controls)
+# 2. SAFE CSS INJECTION (Leaves Sidebar Intact)
 hide_streamlit_style = """
             <style>
-            /* 1. Hides the white header bar at the top */
-            [data-testid="stHeader"] {display: none !important;}
-            
-            /* 2. Pulls the dashboard up to remove the top white space AND adds 100px of invisible space to the bottom */
+            /* Gently pulls the dashboard up without breaking the sidebar controls */
             .block-container {
-                padding-top: 1rem !important; 
-                padding-bottom: 100px !important; 
+                padding-top: 1rem !important;
             }
             
-            /* 3. Hides the top-right hamburger menu and footer */
+            /* Hides only the top-right hamburger menu and bottom footer */
             [data-testid="stToolbar"] {visibility: hidden !important;}
             footer {visibility: hidden !important;}
             </style>
