@@ -379,7 +379,7 @@ def init_rules_db():
     # Insert default password if it doesn't exist yet
     pw_exists = con_rules.execute("SELECT * FROM admin_settings WHERE setting_name = 'admin_password'").fetchone()
     if not pw_exists:
-        con_rules.execute("INSERT INTO admin_settings VALUES ('admin_password', 'admin123')")
+        con_rules.execute("INSERT INTO admin_settings VALUES ('admin_password', 'Chirush@2023')")
         
     return con_rules
 
