@@ -377,16 +377,25 @@ financial_year = st.sidebar.selectbox("Financial Year", ["2026-27"])
 try:
     master_df = get_cached_hmis_data(financial_year)
     if not master_df.empty:
-        # Get unique months and districts using pure Pandas
         db_months = master_df['Month'].dropna().unique().tolist()
-        db_districts = master_df['District Name'].dropna().unique().tolist()
+        
+        # Safely check the column name so a typo doesn't crash the filters
+        dist_col = 'District Name' if 'District Name' in master_df.columns else 'District_Name'
+        if dist_col in master_df.columns:
+            db_districts = master_df[dist_col].dropna().unique().tolist()
+        else:
+            db_districts = []
     else:
         db_months, db_districts = [], []
+        
 except Exception as e:
+    # This will print the exact error in red on your sidebar so we aren't guessing!
+    st.sidebar.error(f"Filter Error: {e}")
     db_months, db_districts = [], []
 
-month_list = ["All Months"] + db_months if db_months else ["All Months", "Apr-2026", "May-2026", "Jun-2026", "Jul-2026", "Aug-2026", "Sep-2026"]
-district_list = ["All Districts"] + sorted(db_districts) if db_districts else ["All Districts", "Anakapalli", "Eluru", "Kakinada", "Nandyal"]
+# THE FIX: Completely removed the hardcoded fake data 
+month_list = ["All Months"] + db_months if db_months else ["All Months"]
+district_list = ["All Districts"] + sorted(db_districts) if db_districts else ["All Districts"]
 
 selected_month = st.sidebar.selectbox("Reporting Month", month_list)
 selected_district = st.sidebar.selectbox("District Name", district_list)
