@@ -431,12 +431,65 @@ except:
 is_admin = (admin_password == current_db_password)
 
 # --- 🚀 ENTERPRISE CACHING LAYER (Solves the 1,000 User Bottleneck) ---
-@st.cache_data(ttl=3600, show_spinner=False)
+@st.cache_data(ttl=600, show_spinner="Fetching data from Google Drive...")
 def get_cached_hmis_data(sel_fy):
-    """Fetches the entire FY once and shares it across all 1,000 users in RAM."""
+    """Downloads and stitches all monthly HMIS files from Google Drive."""
+    import pandas as pd
+    import io
+    from googleapiclient.http import MediaIoBaseDownload
+    
     try:
-        return con_data.execute("SELECT * FROM hmis_master_data WHERE Financial_Year = ?", [sel_fy]).fetchdf()
-    except:
+        service = get_gdrive_service()
+        # Your specific HMIS_Master_Data folder ID
+        folder_id = "1TK3CsZc_9xday99mBbYoLQCMBuVLrznQ"
+        
+        # Search for all files matching the selected Financial Year (e.g., "HMIS_Data_2026-27")
+        query = f"'{folder_id}' in parents and name contains 'HMIS_Data_{sel_fy}' and trashed=false"
+        results = service.files().list(
+            q=query,
+            fields="files(id, name)",
+            includeItemsFromAllDrives=True,
+            supportsAllDrives=True
+        ).execute()
+        
+        items = results.get('files', [])
+        
+        if not items:
+            return pd.DataFrame() # No data found for this FY yet
+            
+        all_dataframes = []
+        
+        for item in items:
+            file_id = item['id']
+            request = service.files().get_media(fileId=file_id, supportsAllDrives=True)
+            
+            # Download the file directly into fast server memory
+            file_buffer = io.BytesIO()
+            downloader = MediaIoBaseDownload(file_buffer, request)
+            done = False
+            while done is False:
+                status, done = downloader.next_chunk()
+            
+            file_buffer.seek(0)
+            
+            # Read the bytes into pandas
+            try:
+                # Safely parse the CSV and ignore any blank placeholder files
+                df = pd.read_csv(file_buffer)
+                if not df.empty:
+                    all_dataframes.append(df)
+            except pd.errors.EmptyDataError:
+                pass 
+                
+        # Stitch all the months together into one master table
+        if all_dataframes:
+            master_df = pd.concat(all_dataframes, ignore_index=True)
+            return master_df
+        else:
+            return pd.DataFrame()
+            
+    except Exception as e:
+        st.error(f"☁️ Failed to load data from Google Drive: {e}")
         return pd.DataFrame()
 
 @st.cache_data(ttl=3600, show_spinner=False)
