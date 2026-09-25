@@ -12,7 +12,19 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 from github import Github
 
-# 1. NEW CACHING FUNCTION: Loads the metrics from your text file only once
+# 1. PAGE CONFIGURATION (Must be the absolute first Streamlit command)
+st.set_page_config(page_title="HMIS Anomalies", layout="wide", initial_sidebar_state="expanded")
+
+# 2. MODERN CLEAN UI CSS INJECTION (Updated tags for newer Streamlit versions)
+hide_streamlit_style = """
+            <style>
+            [data-testid="stToolbar"] {visibility: hidden !important;}
+            footer {visibility: hidden !important;}
+            </style>
+            """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+# 3. CACHING FUNCTION & DATA LOADING (Moved safely below the page config)
 @st.cache_data
 def load_indicator_list():
     with open("metrics.txt", "r", encoding="utf-8") as file:
@@ -20,18 +32,6 @@ def load_indicator_list():
 
 # Streamlit instantly loads this into memory without freezing the screen
 ALL_METRICS_LIST = load_indicator_list()
-
-# --- PAGE CONFIGURATION & CSS HACKS ---
-st.set_page_config(page_title="HMIS Anomalies", layout="wide", initial_sidebar_state="expanded")
-
-# --- CLEAN UI CSS INJECTION ---
-hide_streamlit_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            </style>
-            """
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # --- UNIFIED CUSTOM CSS: THE LOOKER STUDIO THEME & LAYOUT HACKS ---
 st.markdown("""
