@@ -441,6 +441,23 @@ def get_cached_rules():
     except:
         return pd.DataFrame()
 
+# ---> PASTE RIGHT HERE <---
+def get_filtered_hmis_data(sel_fy):
+    """Gets cached Drive data and slices out any months the Admin has turned off."""
+    raw_df = get_cached_hmis_data(sel_fy).copy()
+    if raw_df.empty:
+        return raw_df
+        
+    try:
+        disabled_row = con_rules.execute("SELECT setting_value FROM admin_settings WHERE setting_name = 'disabled_months'").fetchone()
+        
+        if disabled_row and disabled_row[0]:
+            disabled_list = [m.strip() for m in disabled_row[0].split(',')]
+            raw_df = raw_df[~raw_df['Month'].isin(disabled_list)]
+    except Exception:
+        pass 
+        
+    return raw_df
 
 # =====================================================================
 # 2. SIDEBAR: MASTER FILTERS (Now safe to call the functions!)
@@ -1466,7 +1483,7 @@ if is_admin:
     with tabs[7]:
         st.subheader("🔒 State Admin & Database Access")
         
-        admin_action = st.radio("Select Action", ["🧮 Add New Rule", "✏️ Edit/Delete Rule", "📤 Upload HMIS Data"], horizontal=True)
+        admin_action = st.radio("Select Action", ["🧮 Add New Rule", "✏️ Edit/Delete Rule", "📤 Upload HMIS Data", "🛑 Data Exclusions"], horizontal=True)
         st.divider()
         
         if admin_action == "📤 Upload HMIS Data":
@@ -1915,3 +1932,39 @@ if is_admin:
                             except Exception as e:
                                 st.error(f"Error deleting rule: {e}")
             render_edit_rule()
+
+        elif admin_action == "🛑 Data Exclusions":
+                    @st.fragment
+                    def render_data_exclusions():
+                        st.markdown("### 🛑 Data Exclusions (Admin Only)")
+                        st.info("Months disabled here will automatically be excluded across the entire dashboard.")
+                        
+                        # Grab all raw months directly from the cache to show in the Admin dropdown
+                        raw_admin_df = get_cached_hmis_data(financial_year)
+                        all_raw_months = raw_admin_df['Month'].dropna().unique().tolist() if not raw_admin_df.empty else []
+                        
+                        # Fetch any months you previously disabled from the database
+                        try:
+                            current_disabled_row = con_rules.execute("SELECT setting_value FROM admin_settings WHERE setting_name = 'disabled_months'").fetchone()
+                            current_disabled = [m.strip() for m in current_disabled_row[0].split(',')] if current_disabled_row and current_disabled_row[0] else []
+                        except:
+                            current_disabled = []
+                            
+                        # Display the multi-select dropdown UI
+                        valid_disabled = [m for m in current_disabled if m in all_raw_months]
+                        disabled_selection = st.multiselect("Select months to hide from the dashboard:", options=all_raw_months, default=valid_disabled)
+                        
+                        # Save the new settings to the database
+                        if st.button("💾 Save Exclusion Settings", type="primary"):
+                            new_disabled_str = ",".join(disabled_selection)
+                            
+                            # Update or insert into the admin_settings table
+                            exists = con_rules.execute("SELECT * FROM admin_settings WHERE setting_name = 'disabled_months'").fetchone()
+                            if exists:
+                                con_rules.execute("UPDATE admin_settings SET setting_value = ? WHERE setting_name = 'disabled_months'", [new_disabled_str])
+                            else:
+                                con_rules.execute("INSERT INTO admin_settings (setting_name, setting_value) VALUES ('disabled_months', ?)", [new_disabled_str])
+                                
+                            st.success("✅ Settings saved! The dashboard will now hide those months.")
+                    
+                    render_data_exclusions()
