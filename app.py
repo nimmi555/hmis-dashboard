@@ -282,22 +282,6 @@ def upload_to_drive_with_overwrite(file_buffer, file_name, mime_type):
     
     return uploaded_file.get('id')
 
-# =====================================================================
-# --- INITIALIZE DUCKDB DATABASES (SPLIT ARCHITECTURE) ---
-# =====================================================================
-
-# 1. Temporary Data Connection (Safe to delete/overwrite)
-@st.cache_resource
-def init_data_db():
-    con_data = duckdb.connect("hmis_raw_data.duckdb")  
-    con_data.execute("""
-        CREATE TABLE IF NOT EXISTS hmis_master_data (
-            Financial_Year VARCHAR, Month VARCHAR, District_Name VARCHAR,
-            Format_Type VARCHAR, Facility_Code VARCHAR, Facility_Name VARCHAR
-        )
-    """)
-    return con_data
-
 # 2. Permanent Rules Connection (Never delete)
 @st.cache_resource
 def init_rules_db():
@@ -383,20 +367,21 @@ def init_rules_db():
     return con_rules
 
 # Establish both connections for the app to use
-con_data = init_data_db()
 con_rules = init_rules_db()
 
 # --- SIDEBAR: MASTER FILTERS ---
 st.sidebar.header("🔍 Global Filters")
 financial_year = st.sidebar.selectbox("Financial Year", ["2026-27"])
 
-# Extract dynamic lists from the Database
+# Extract dynamic lists directly from the Cloud DataFrame
 try:
-    db_months = con_data.execute("SELECT DISTINCT Month FROM hmis_master_data WHERE Month IS NOT NULL").fetchdf()['Month'].tolist()
-    
-    # --- THE FIX: Look for "District Name" with a space, using double quotes for SQL ---
-    db_districts = con_data.execute('SELECT DISTINCT "District Name" FROM hmis_master_data WHERE "District Name" IS NOT NULL').fetchdf()['District Name'].tolist()
-    
+    master_df = get_cached_hmis_data(financial_year)
+    if not master_df.empty:
+        # Get unique months and districts using pure Pandas
+        db_months = master_df['Month'].dropna().unique().tolist()
+        db_districts = master_df['District Name'].dropna().unique().tolist()
+    else:
+        db_months, db_districts = [], []
 except Exception as e:
     db_months, db_districts = [], []
 
