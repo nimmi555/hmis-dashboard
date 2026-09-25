@@ -501,18 +501,23 @@ if search_triggered:
     st.sidebar.success("Filters applied globally!")
 
 # =====================================================================
-# 3. SECURE ADMIN ACCESS
+# 3. SECURE ADMIN ACCESS (HIDDEN BY URL)
 # =====================================================================
 st.sidebar.markdown("---")
-admin_password = st.sidebar.text_input("🔒 Admin Access", type="password", help="Enter master password to unlock Admin tab")
 
-# Fetch current password directly from the database
-try:
-    current_db_password = con_rules.execute("SELECT setting_value FROM admin_settings WHERE setting_name = 'admin_password'").fetchone()[0]
-except:
-    current_db_password = "admin" # Failsafe just in case table is empty
+# 1. The Backdoor: Only show the password box if the URL contains "?mode=admin"
+if st.query_params.get("mode") == "admin":
+    admin_password = st.sidebar.text_input("🔒 Admin Access", type="password", help="Enter master password to unlock")
+    
+    # Fetch current password directly from the database
+    try:
+        current_db_password = con_rules.execute("SELECT setting_value FROM admin_settings WHERE setting_name = 'admin_password'").fetchone()[0]
+    except:
+        current_db_password = "admin" # Failsafe just in case table is empty
 
-is_admin = (admin_password == current_db_password)
+    is_admin = (admin_password == current_db_password)
+else:
+    is_admin = False
 
 # --- MASTER EXECUTION ENGINE: REAL DATA BINDING ---
 def run_anomaly_engine(sel_fy, sel_month, sel_dist, fac_code):
