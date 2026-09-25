@@ -944,7 +944,10 @@ def show_drilldown_modal(selected_anomaly, raw_df, financial_year, selected_mont
                     if col['field'] == 'S.No': col['width'], col['pinned'], col['filter'] = 70, 'left', False
                     elif col['field'] not in base_cols: col['filter'] = False
                         
-                AgGrid(drill_final, gridOptions=gridOptions_drill, theme='alpine', custom_css=shared_custom_css, fit_columns_on_grid_load=False, height=400, key="modal_grid")
+                # THE FIX: Generate a unique mathematical hash so AgGrid never draws a blank ghost table
+                dynamic_key = f"drill_grid_{abs(hash(selected_anomaly))}"
+                
+                AgGrid(drill_final, gridOptions=gridOptions_drill, theme='alpine', custom_css=shared_custom_css, fit_columns_on_grid_load=False, height=400, key=dynamic_key)
                 
                # DOWNLOAD INSIDE MODAL
                 # 1. Clean the dataframe by dropping unwanted columns
