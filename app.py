@@ -1413,24 +1413,43 @@ if is_admin:
             
             # --- BRAND NEW FUNCTION TO BREAK THE CACHE ---
             def force_drive_sync(file_buffer, file_name, mime_type):
-                """Bypasses Google API indexing delays by forcing the upload."""
+                """Bypasses Google API indexing delays by forcing the upload with visibility flags."""
                 from googleapiclient.http import MediaIoBaseUpload
                 service = get_gdrive_service()
-                folder_id = "1TK3CsZc_9xday99mbBYoLQCMBuVLrznQ" 
                 
-                # 1. Try to search and delete, but ignore the 404 bug if it happens
+                # Stripping any accidental invisible spaces
+                folder_id = "1TK3CsZc_9xday99mbBYoLQCMBuVLrznQ".strip()
+                
+                # 1. Search and delete (with forced visibility flags)
                 try:
                     query = f"name='{file_name}' and '{folder_id}' in parents and trashed=false"
-                    results = service.files().list(q=query, fields="files(id)").execute()
+                    results = service.files().list(
+                        q=query, 
+                        fields="files(id)",
+                        includeItemsFromAllDrives=True, 
+                        supportsAllDrives=True
+                    ).execute()
+                    
                     for existing in results.get('files', []):
-                        service.files().delete(fileId=existing['id']).execute()
+                        service.files().delete(
+                            fileId=existing['id'],
+                            supportsAllDrives=True
+                        ).execute()
                 except Exception:
-                    pass # Ignore the false 404 error and proceed
+                    pass # Ignore false 404 errors during search
                 
-                # 2. Force the file creation
+                # 2. Force the file creation (WITH THE BYPASS FLAGS)
                 file_metadata = {'name': file_name, 'parents': [folder_id]}
                 media = MediaIoBaseUpload(file_buffer, mimetype=mime_type, resumable=True)
-                uploaded_file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+                
+                # We must tell the API to look outside the robot's personal drive to find your folder
+                uploaded_file = service.files().create(
+                    body=file_metadata, 
+                    media_body=media, 
+                    fields='id',
+                    supportsAllDrives=True
+                ).execute()
+                
                 return uploaded_file.get('id')
 
             @st.fragment
