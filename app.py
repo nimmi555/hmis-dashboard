@@ -209,7 +209,37 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-
+# =====================================================================
+# --- GITHUB AUTO-SYNC FUNCTION ---
+# =====================================================================
+def sync_rules_to_github():
+    """Exports DuckDB rules to Excel and pushes a commit to GitHub."""
+    import io
+    import pandas as pd
+    from github import Github
+    try:
+        # Fetch current rules from your live database
+        df = con_rules.execute("SELECT * FROM rules_metadata_v3").fetchdf()
+        
+        # Convert to an Excel file in memory
+        excel_buffer = io.BytesIO()
+        df.to_excel(excel_buffer, index=False, engine='openpyxl')
+        file_content = excel_buffer.getvalue()
+        
+        # Authenticate with GitHub using Streamlit Secrets
+        g = Github(st.secrets["github_token"])
+        repo = g.get_repo("nimmi555/hmis-dashboard")
+        file_path = "rules_backup.xlsx"
+        
+        # Push the commit to GitHub
+        try:
+            contents = repo.get_contents(file_path)
+            repo.update_file(contents.path, "Auto-sync: Rules updated from dashboard", file_content, contents.sha)
+        except:
+            repo.create_file(file_path, "Auto-sync: Initial rules backup created", file_content)
+            
+    except Exception as e:
+        st.error(f"GitHub Sync Failed: {e}")
 
 # =====================================================================
 # --- INITIALIZE DUCKDB DATABASES (SPLIT ARCHITECTURE) ---
