@@ -369,61 +369,9 @@ def init_rules_db():
 # Establish both connections for the app to use
 con_rules = init_rules_db()
 
-# --- SIDEBAR: MASTER FILTERS ---
-st.sidebar.header("🔍 Global Filters")
-financial_year = st.sidebar.selectbox("Financial Year", ["2026-27"])
-
-# Extract dynamic lists directly from the Cloud DataFrame
-try:
-    master_df = get_cached_hmis_data(financial_year)
-    if not master_df.empty:
-        db_months = master_df['Month'].dropna().unique().tolist()
-        
-        # Safely check the column name so a typo doesn't crash the filters
-        dist_col = 'District Name' if 'District Name' in master_df.columns else 'District_Name'
-        if dist_col in master_df.columns:
-            db_districts = master_df[dist_col].dropna().unique().tolist()
-        else:
-            db_districts = []
-    else:
-        db_months, db_districts = [], []
-        
-except Exception as e:
-    # This will print the exact error in red on your sidebar so we aren't guessing!
-    st.sidebar.error(f"Filter Error: {e}")
-    db_months, db_districts = [], []
-
-# THE FIX: Completely removed the hardcoded fake data 
-month_list = ["All Months"] + db_months if db_months else ["All Months"]
-district_list = ["All Districts"] + sorted(db_districts) if db_districts else ["All Districts"]
-
-selected_month = st.sidebar.selectbox("Reporting Month", month_list)
-selected_district = st.sidebar.selectbox("District Name", district_list)
-facility_code = st.sidebar.text_input("Facility Code", placeholder="e.g., 44151234")
-
-col_empty, col_btn = st.sidebar.columns([2, 1.5])
-with col_btn:
-    search_triggered = st.button("🔍 Search", use_container_width=True)
-
-if search_triggered:
-    st.sidebar.success("Filters applied globally!")
-
-# --- SECURE ADMIN ACCESS ---
-st.sidebar.markdown("---")
-admin_password = st.sidebar.text_input("🔒 Admin Access", type="password", help="Enter master password to unlock Admin tab")
-
-# Check if the typed password matches the one in your Secrets vault
-is_admin = (admin_password == st.secrets["admin_password"])
-
-# Fetch current password directly from the database
-try:
-    current_db_password = con_rules.execute("SELECT setting_value FROM admin_settings WHERE setting_name = 'admin_password'").fetchone()[0]
-except:
-    current_db_password = "admin" # Failsafe just in case table is empty
-
-is_admin = (admin_password == current_db_password)
-
-# --- 🚀 ENTERPRISE CACHING LAYER (Solves the 1,000 User Bottleneck) ---
+# =====================================================================
+# 1. 🚀 ENTERPRISE CACHING LAYER (Must be defined first!)
+# =====================================================================
 @st.cache_data(ttl=600, show_spinner="Fetching data from Google Drive...")
 def get_cached_hmis_data(sel_fy):
     """Downloads and stitches all monthly HMIS files from Google Drive."""
@@ -492,6 +440,62 @@ def get_cached_rules():
         return con_rules.execute("SELECT * FROM rules_metadata_v3").fetchdf()
     except:
         return pd.DataFrame()
+
+
+# =====================================================================
+# 2. SIDEBAR: MASTER FILTERS (Now safe to call the functions!)
+# =====================================================================
+st.sidebar.header("🔍 Global Filters")
+financial_year = st.sidebar.selectbox("Financial Year", ["2026-27"])
+
+# Extract dynamic lists directly from the Cloud DataFrame
+try:
+    master_df = get_cached_hmis_data(financial_year)
+    if not master_df.empty:
+        db_months = master_df['Month'].dropna().unique().tolist()
+        
+        # Safely check the column name so a typo doesn't crash the filters
+        dist_col = 'District Name' if 'District Name' in master_df.columns else 'District_Name'
+        if dist_col in master_df.columns:
+            db_districts = master_df[dist_col].dropna().unique().tolist()
+        else:
+            db_districts = []
+    else:
+        db_months, db_districts = [], []
+        
+except Exception as e:
+    # This will print the exact error in red on your sidebar so we aren't guessing!
+    st.sidebar.error(f"Filter Error: {e}")
+    db_months, db_districts = [], []
+
+# Completely removed the hardcoded fake data 
+month_list = ["All Months"] + db_months if db_months else ["All Months"]
+district_list = ["All Districts"] + sorted(db_districts) if db_districts else ["All Districts"]
+
+selected_month = st.sidebar.selectbox("Reporting Month", month_list)
+selected_district = st.sidebar.selectbox("District Name", district_list)
+facility_code = st.sidebar.text_input("Facility Code", placeholder="e.g., 44151234")
+
+col_empty, col_btn = st.sidebar.columns([2, 1.5])
+with col_btn:
+    search_triggered = st.button("🔍 Search", use_container_width=True)
+
+if search_triggered:
+    st.sidebar.success("Filters applied globally!")
+
+# =====================================================================
+# 3. SECURE ADMIN ACCESS
+# =====================================================================
+st.sidebar.markdown("---")
+admin_password = st.sidebar.text_input("🔒 Admin Access", type="password", help="Enter master password to unlock Admin tab")
+
+# Fetch current password directly from the database
+try:
+    current_db_password = con_rules.execute("SELECT setting_value FROM admin_settings WHERE setting_name = 'admin_password'").fetchone()[0]
+except:
+    current_db_password = "admin" # Failsafe just in case table is empty
+
+is_admin = (admin_password == current_db_password)
 
 # --- MASTER EXECUTION ENGINE: REAL DATA BINDING ---
 def run_anomaly_engine(sel_fy, sel_month, sel_dist, fac_code):
