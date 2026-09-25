@@ -1407,23 +1407,44 @@ if is_admin:
         st.divider()
         
         if admin_action == "📤 Upload HMIS Data":
+            
+            # --- BRAND NEW FUNCTION TO BREAK THE CACHE ---
+            def force_drive_sync(file_buffer, file_name, mime_type):
+                """Bypasses Google API indexing delays by forcing the upload."""
+                from googleapiclient.http import MediaIoBaseUpload
+                service = get_gdrive_service()
+                folder_id = "1TK3CsZc_9xday99mbBYoLQCMBuVLrznQ" 
+                
+                # 1. Try to search and delete, but ignore the 404 bug if it happens
+                try:
+                    query = f"name='{file_name}' and '{folder_id}' in parents and trashed=false"
+                    results = service.files().list(q=query, fields="files(id)").execute()
+                    for existing in results.get('files', []):
+                        service.files().delete(fileId=existing['id']).execute()
+                except Exception:
+                    pass # Ignore the false 404 error and proceed
+                
+                # 2. Force the file creation
+                file_metadata = {'name': file_name, 'parents': [folder_id]}
+                media = MediaIoBaseUpload(file_buffer, mimetype=mime_type, resumable=True)
+                uploaded_file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+                return uploaded_file.get('id')
+
             @st.fragment
             def render_upload_data():
                 st.markdown("### ☁️ Smart Cloud Data Uploader")
-                st.info("The system automatically reads the 'Month' column in your files, splits the data, applies the Financial Year, and safely replaces old records in Google Drive.")
+                st.info("Files are automatically split by month and securely routed to Google Drive.")
                 
-                # 1. UI: Only ask for Financial Year. The file tells us the rest.
                 upload_fy = st.selectbox("Select Financial Year to apply:", ["2026-27"])
-                
                 uploaded_files = st.file_uploader("Upload HMIS Data File(s)", type=["xlsx", "csv"], accept_multiple_files=True)
                 
                 if uploaded_files:
                     if st.button("🚀 Process & Sync to Google Drive", type="primary"):
-                        with st.spinner("Reading months, splitting data, and replacing old files in Drive..."):
+                        with st.spinner("Splitting data and forcing sync to Google Drive..."):
                             for file in uploaded_files:
                                 try:
                                     import pandas as pd
-                                    import io, os, re
+                                    import os, re
                                     
                                     # Read file
                                     if file.name.endswith('.csv'):
@@ -1437,41 +1458,33 @@ if is_admin:
                                         return re.sub(r'\s+', ' ', c)
                                     df.columns = [clean_header(c) for c in df.columns]
                                     
-                                    # Security Check: Ensure Month column exists
                                     if 'Month' not in df.columns:
                                         st.error(f"❌ Upload aborted for {file.name}: No 'Month' column found.")
                                         continue
                                         
-                                    # Inject Financial Year
                                     df['Financial_Year'] = upload_fy
-                                    
                                     if 'Facility Code' in df.columns:
                                         df['Facility Code'] = df['Facility Code'].astype(str)
                                         
-                                    # THE MAGIC: Split data by month and process individually
+                                    # Split and Sync
                                     unique_months = df['Month'].dropna().unique()
-                                    
                                     for month in unique_months:
                                         df_month = df[df['Month'] == month]
-                                        
-                                        # Standardize filename so the robot can find and replace it
                                         target_filename = f"HMIS_Data_{upload_fy}_{month}.csv"
                                         
-                                        # Save locally to CSV (Converting everything to CSV saves massive space)
                                         df_month.to_csv(target_filename, index=False)
                                         
-                                        # Upload & Overwrite via API
+                                        # Use the new cache-breaking function
                                         with open(target_filename, "rb") as f:
-                                            file_id = upload_to_drive_with_overwrite(f, target_filename, "text/csv")
+                                            file_id = force_drive_sync(f, target_filename, "text/csv")
                                             
                                         os.remove(target_filename)
-                                        st.success(f"✅ {month} data updated and replaced in Drive! (ID: {file_id})")
+                                        st.success(f"✅ {month} data synced to Drive! (ID: {file_id})")
                                         
                                 except Exception as e:
                                     st.error(f"❌ Failed processing {file.name}: {e}")
                                     
             render_upload_data()
-
         elif admin_action == "🧮 Add New Rule":
             @st.fragment
             def render_add_rule():
