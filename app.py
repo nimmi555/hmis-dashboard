@@ -206,27 +206,42 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- INITIALIZE DUCKDB DATABASE ---
+# =====================================================================
+# --- INITIALIZE DUCKDB DATABASES (SPLIT ARCHITECTURE) ---
+# =====================================================================
+
+# 1. Temporary Data Connection (Safe to delete/overwrite)
 @st.cache_resource
-def init_db():
-    con = duckdb.connect("hmis_database.duckdb")  
-    con.execute("""
+def init_data_db():
+    con_data = duckdb.connect("hmis_raw_data.duckdb")  
+    con_data.execute("""
         CREATE TABLE IF NOT EXISTS hmis_master_data (
             Financial_Year VARCHAR, Month VARCHAR, District_Name VARCHAR,
             Format_Type VARCHAR, Facility_Code VARCHAR, Facility_Name VARCHAR
         )
     """)
-    con.execute("""
+    return con_data
+
+# 2. Permanent Rules Connection (Never delete)
+@st.cache_resource
+def init_rules_db():
+    con_rules = duckdb.connect("hmis_rules.duckdb")  
+    con_rules.execute("""
         CREATE TABLE IF NOT EXISTS rules_metadata_v3 (
             Category_Code VARCHAR, Rule_ID VARCHAR, Rule_Description VARCHAR,
             Target_Format VARCHAR, Rule_Type VARCHAR, Logic_LHS VARCHAR, 
             Operator VARCHAR, Logic_RHS VARCHAR, Show_Difference BOOLEAN
         )
     """)
+    return con_rules
+
+# Establish both connections for the app to use
+con_data = init_data_db()
+con_rules = init_rules_db()
     
     # --- STEP 1: DATABASE AUTO-MIGRATION FOR DIMENSIONS & MOM PATTERNS ---
     try:
-        existing_cols = [row[1] for row in con.execute("PRAGMA table_info('rules_metadata_v3')").fetchall()]
+        existing_cols = [row[1] for row in con_rules.execute("PRAGMA table_info('rules_metadata_v3')").fetchall()]
         schema_additions = {
             "Rule_Category": "VARCHAR DEFAULT 'Single Month'",
             "Trend_Pattern": "VARCHAR DEFAULT 'None'",
@@ -237,25 +252,26 @@ def init_db():
         }
         for col_name, col_def in schema_additions.items():
             if col_name not in existing_cols:
-                con.execute(f"ALTER TABLE rules_metadata_v3 ADD COLUMN {col_name} {col_def}")
+                con_rules.execute(f"ALTER TABLE rules_metadata_v3 ADD COLUMN {col_name} {col_def}")
     except Exception as e:
         pass
         
     # Create table for secure admin settings
-    con.execute("""
+    con_rules.execute("""
         CREATE TABLE IF NOT EXISTS admin_settings (
             setting_name VARCHAR, setting_value VARCHAR
         )
     """)
     
     # Insert default password if it doesn't exist yet
-    pw_exists = con.execute("SELECT * FROM admin_settings WHERE setting_name = 'admin_password'").fetchone()
+    pw_exists = con_rules.execute("SELECT * FROM admin_settings WHERE setting_name = 'admin_password'").fetchone()
     if not pw_exists:
-        con.execute("INSERT INTO admin_settings VALUES ('admin_password', 'admin123')")
+        con_rules.execute("INSERT INTO admin_settings VALUES ('admin_password', 'admin123')")
         
-    return con
+    return con_rules
 
-con = init_db()
+con_data = init_data_db()
+con_rules = init_rules_db()
 
 # --- SIDEBAR: MASTER FILTERS ---
 st.sidebar.header("🔍 Global Filters")
@@ -263,10 +279,10 @@ financial_year = st.sidebar.selectbox("Financial Year", ["2026-27"])
 
 # Extract dynamic lists from the Database
 try:
-    db_months = con.execute("SELECT DISTINCT Month FROM hmis_master_data WHERE Month IS NOT NULL").fetchdf()['Month'].tolist()
+    db_months = con_data.execute("SELECT DISTINCT Month FROM hmis_master_data WHERE Month IS NOT NULL").fetchdf()['Month'].tolist()
     
     # --- THE FIX: Look for "District Name" with a space, using double quotes for SQL ---
-    db_districts = con.execute('SELECT DISTINCT "District Name" FROM hmis_master_data WHERE "District Name" IS NOT NULL').fetchdf()['District Name'].tolist()
+    db_districts = con_data.execute('SELECT DISTINCT "District Name" FROM hmis_master_data WHERE "District Name" IS NOT NULL').fetchdf()['District Name'].tolist()
     
 except Exception as e:
     db_months, db_districts = [], []
@@ -291,7 +307,7 @@ admin_password = st.sidebar.text_input("🔒 Admin Access", type="password", hel
 
 # Fetch current password directly from the database
 try:
-    current_db_password = con.execute("SELECT setting_value FROM admin_settings WHERE setting_name = 'admin_password'").fetchone()[0]
+    current_db_password = con_rules.execute("SELECT setting_value FROM admin_settings WHERE setting_name = 'admin_password'").fetchone()[0]
 except:
     current_db_password = "admin" # Failsafe just in case table is empty
 
@@ -302,7 +318,7 @@ is_admin = (admin_password == current_db_password)
 def get_cached_hmis_data(sel_fy):
     """Fetches the entire FY once and shares it across all 1,000 users in RAM."""
     try:
-        return con.execute("SELECT * FROM hmis_master_data WHERE Financial_Year = ?", [sel_fy]).fetchdf()
+        return con_data.execute("SELECT * FROM hmis_master_data WHERE Financial_Year = ?", [sel_fy]).fetchdf()
     except:
         return pd.DataFrame()
 
@@ -310,7 +326,7 @@ def get_cached_hmis_data(sel_fy):
 def get_cached_rules():
     """Caches the rules dictionary to prevent database locking."""
     try:
-        return con.execute("SELECT * FROM rules_metadata_v3").fetchdf()
+        return con_rules.execute("SELECT * FROM rules_metadata_v3").fetchdf()
     except:
         return pd.DataFrame()
 
@@ -685,7 +701,7 @@ def show_drilldown_modal(selected_anomaly, raw_df, financial_year, selected_mont
     st.markdown(f"<h4 style='color: #d32f2f; margin-top: -10px; margin-bottom: 20px;'>{selected_anomaly}</h4>", unsafe_allow_html=True)
     
     try:
-        rule_info_df = con.execute("SELECT * FROM rules_metadata_v3 WHERE Rule_Description = ?", [selected_anomaly]).fetchdf()
+        rule_info_df = con_rules.execute("SELECT * FROM rules_metadata_v3 WHERE Rule_Description = ?", [selected_anomaly]).fetchdf()
         if rule_info_df.empty:
             st.error("Rule metadata missing.")
             return
@@ -957,7 +973,7 @@ with tab2:
                     if selected_district != "All Districts": query += ' AND "District Name" = ?'; params.append(selected_district)
                     if facility_code: query += ' AND "Facility Code" = ?'; params.append(facility_code)
                     
-                    raw_df_modal = con.execute(query, params).fetchdf()
+                    raw_df_modal = con_data.execute(query, params).fetchdf()
                     show_drilldown_modal(selected_val, raw_df_modal, financial_year, selected_month, selected_district, facility_code)
             else:
                 # Clear the lock if they unclick the row, so they can click it again later if they want
@@ -1046,7 +1062,7 @@ if is_admin:
             st.subheader("🎯 Interactive Anomaly Rule Execution Viewer")
             
             active_cat_t4 = st.selectbox("📌 Select Anomaly Category:", [f"M{i}" for i in range(1, 18)], key="cat_tab4")
-            rules_df = con.execute("SELECT Rule_ID, Rule_Description, Target_Format, Logic_LHS, Operator, Logic_RHS FROM rules_metadata_v3 WHERE Category_Code = ?", [active_cat_t4]).fetchdf()
+            rules_df = con_rules.execute("SELECT Rule_ID, Rule_Description, Target_Format, Logic_LHS, Operator, Logic_RHS FROM rules_metadata_v3 WHERE Category_Code = ?", [active_cat_t4]).fetchdf()
             
             # --- FIX: THIS ENTIRE BLOCK MUST BE INDENTED UNDER 'with tab4:' ---
             if not rules_df.empty:
@@ -1087,7 +1103,7 @@ if is_admin:
                     params.append(facility_code)
                     
                 try:
-                    df_rule_raw = con.execute(query, params).fetchdf()
+                    df_rule_raw = con_rules.execute(query, params).fetchdf()
                 except:
                     df_rule_raw = pd.DataFrame()
                     
@@ -1168,7 +1184,7 @@ with tab5:
         
         try:
             # --- FIX: Fetch ONLY the 7 required columns and ONLY Single Month rules ---
-            rules_df = con.execute("""
+            rules_df = con_rules.execute("""
                 SELECT Category_Code, Rule_ID, Rule_Description, Target_Format, Logic_LHS, Operator, Logic_RHS 
                 FROM rules_metadata_v3 
                 WHERE Rule_Category = 'Single Month' OR Rule_Category IS NULL OR Rule_Type = 'Math'
@@ -1353,30 +1369,30 @@ if is_admin:
                                         try:
                                             # If the user explicitly checked the full reset box on the first file
                                             if force_rebuild and success_count == 0:
-                                                con.execute("DROP TABLE IF EXISTS hmis_master_data")
+                                                con_data.execute("DROP TABLE IF EXISTS hmis_master_data")
                                                 
-                                            current_cols = con.execute("DESCRIBE hmis_master_data").fetchdf()
+                                            current_cols = con_data.execute("DESCRIBE hmis_master_data").fetchdf()
                                             
                                             # Blow up old mock table if it exists (fewer than 50 columns)
                                             if len(current_cols) < 50:
-                                                con.execute("DROP TABLE IF EXISTS hmis_master_data")
-                                                con.execute("CREATE TABLE hmis_master_data AS SELECT * FROM df_raw")
+                                                con_data.execute("DROP TABLE IF EXISTS hmis_master_data")
+                                                con_data.execute("CREATE TABLE hmis_master_data AS SELECT * FROM df_raw")
                                             else:
                                                 # If this is the first file in the loop, safely wipe ONLY the targeted months
                                                 if success_count == 0 and not force_rebuild:
                                                     for target_mo in selected_upload_months:
-                                                        con.execute("DELETE FROM hmis_master_data WHERE Financial_Year = ? AND Month = ?", [upload_fy, target_mo])
+                                                        con_data.execute("DELETE FROM hmis_master_data WHERE Financial_Year = ? AND Month = ?", [upload_fy, target_mo])
                                                 
-                                                db_columns = con.execute("SELECT * FROM hmis_master_data LIMIT 0").fetchdf().columns
+                                                db_columns = con_data.execute("SELECT * FROM hmis_master_data LIMIT 0").fetchdf().columns
                                                 for col in db_columns:
                                                     if col not in df_raw.columns:
                                                         df_raw[col] = None 
                                                 df_raw = df_raw[db_columns]
-                                                con.execute("INSERT INTO hmis_master_data SELECT * FROM df_raw")
+                                                con_data.execute("INSERT INTO hmis_master_data SELECT * FROM df_raw")
                                                 
                                         except Exception as e:
                                             # If table completely doesn't exist, create it cleanly!
-                                            con.execute("CREATE TABLE hmis_master_data AS SELECT * FROM df_raw")
+                                            con_data.execute("CREATE TABLE hmis_master_data AS SELECT * FROM df_raw")
                                             
                                         success_count += 1
                                     except Exception as e:
@@ -1429,7 +1445,7 @@ if is_admin:
                     new_rule_cat = st.selectbox("Assign to Category", [f"M{i}" for i in range(1, 18)], key="new_cat")
                 
                 try:
-                    cat_rules = con.execute("SELECT Rule_ID FROM rules_metadata_v3 WHERE Category_Code = ?", [new_rule_cat]).fetchdf()
+                    cat_rules = con_rules.execute("SELECT Rule_ID FROM rules_metadata_v3 WHERE Category_Code = ?", [new_rule_cat]).fetchdf()
                     if not cat_rules.empty:
                         import re
                         max_num = 0
@@ -1497,7 +1513,7 @@ if is_admin:
                     with col_rhs: rhs_expr = st.text_area("Right Hand Side (RHS)", key="rhs_input")
                         
                     if st.button("💾 Save Mathematical Rule", type="primary"):
-                        check_dup = con.execute("SELECT COUNT(*) FROM rules_metadata_v3 WHERE Category_Code = ? AND Rule_ID = ?", [new_rule_cat, new_rule_id]).fetchone()[0]
+                        check_dup = con_rules.execute("SELECT COUNT(*) FROM rules_metadata_v3 WHERE Category_Code = ? AND Rule_ID = ?", [new_rule_cat, new_rule_id]).fetchone()[0]
                         if not new_rule_id or not new_rule_desc:
                             st.markdown("<p style='color:red; font-weight:bold; font-size:16px;'>❌ Rule ID and Rule Description cannot be empty.</p>", unsafe_allow_html=True)
                         elif check_dup > 0:
@@ -1505,7 +1521,7 @@ if is_admin:
                         else:
                             try:
                                 # Inserting all 15 columns safely
-                                con.execute(
+                                con_rules.execute(
                                     "INSERT INTO rules_metadata_v3 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
                                     [new_rule_cat, new_rule_id, new_rule_desc, target_format, 'Math', lhs_expr, operator, rhs_expr, True,
                                     "Single Month", "None", phc_area_scope, non_phc_ownership, 1, 0.0]
@@ -1572,7 +1588,7 @@ if is_admin:
                         operator, rhs_expr = "==", "All Values Identical"
                     
                     if st.button("💾 Save Trend Rule", type="primary"):
-                        check_dup = con.execute("SELECT COUNT(*) FROM rules_metadata_v3 WHERE Category_Code = ? AND Rule_ID = ?", [new_rule_cat, new_rule_id]).fetchone()[0]
+                        check_dup = con_rules.execute("SELECT COUNT(*) FROM rules_metadata_v3 WHERE Category_Code = ? AND Rule_ID = ?", [new_rule_cat, new_rule_id]).fetchone()[0]
                         
                         # Prevent saving if a dropdown is left empty
                         if not new_rule_id or not new_rule_desc or not lhs_expr or "-- Select" in lhs_expr:
@@ -1581,7 +1597,7 @@ if is_admin:
                             st.markdown(f"<p style='color:red; font-weight:bold; font-size:16px;'>❌ ERROR: Rule '{new_rule_id}' exists!</p>", unsafe_allow_html=True)
                         else:
                             try:
-                                con.execute(
+                                con_rules.execute(
                                     "INSERT INTO rules_metadata_v3 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
                                     [new_rule_cat, new_rule_id, new_rule_desc, target_format, 'Trend', lhs_expr, operator, rhs_expr, True,
                                     "MoM Trend", trend_pattern, phc_area_scope, non_phc_ownership, int(trend_window), float(trend_threshold)]
@@ -1618,7 +1634,7 @@ if is_admin:
                 edit_cat = st.selectbox("📌 Select Category to Edit/Delete From", [f"M{i}" for i in range(1, 18)], key="edit_cat_select")
                 
                 try:
-                    all_rules_df = con.execute("SELECT Rule_ID FROM rules_metadata_v3 WHERE Category_Code = ?", [edit_cat]).fetchdf()
+                    all_rules_df = con_rules.execute("SELECT Rule_ID FROM rules_metadata_v3 WHERE Category_Code = ?", [edit_cat]).fetchdf()
                     all_rules = ["-- Select a Rule --"] + all_rules_df['Rule_ID'].astype(str).tolist()
                 except:
                     all_rules = ["-- Select a Rule --"]
@@ -1629,7 +1645,7 @@ if is_admin:
                     rule_to_edit = st.selectbox("📌 Select Rule to Edit/Delete", all_rules)
                     
                     if rule_to_edit != "-- Select a Rule --":
-                        rule_details = con.execute("SELECT * FROM rules_metadata_v3 WHERE Category_Code = ? AND Rule_ID = ?", [edit_cat, rule_to_edit]).fetchdf().iloc[0]
+                        rule_details = con_rules.execute("SELECT * FROM rules_metadata_v3 WHERE Category_Code = ? AND Rule_ID = ?", [edit_cat, rule_to_edit]).fetchdf().iloc[0]
                         
                         edit_tracking_key = f"{edit_cat}_{rule_to_edit}"
                         if 'current_edit_rule' not in st.session_state or st.session_state.current_edit_rule != edit_tracking_key:
@@ -1695,7 +1711,7 @@ if is_admin:
                         if col_save.button("💾 Save Changes", type="primary", use_container_width=True):
                             try:
                                 # Safely update using BOTH Category Code and Rule ID + new dimensions
-                                con.execute("""
+                                con_rules.execute("""
                                     UPDATE rules_metadata_v3 
                                     SET Rule_Description = ?, Target_Format = ?, Logic_LHS = ?, Operator = ?, Logic_RHS = ?, PHC_Area_Scope = ?, Non_PHC_Ownership = ?
                                     WHERE Category_Code = ? AND Rule_ID = ?
@@ -1712,7 +1728,7 @@ if is_admin:
                                 
                         if col_del.button("🗑️ Permanently Delete Rule", use_container_width=True):
                             try:
-                                con.execute("DELETE FROM rules_metadata_v3 WHERE Category_Code = ? AND Rule_ID = ?", [edit_cat, rule_to_edit])
+                                con_rules.execute("DELETE FROM rules_metadata_v3 WHERE Category_Code = ? AND Rule_ID = ?", [edit_cat, rule_to_edit])
                                 
                                 for key in ['edit_desc', 'edit_lhs_input', 'edit_rhs_input', 'current_edit_rule']:
                                     if key in st.session_state: del st.session_state[key]
@@ -1746,7 +1762,7 @@ if is_admin:
                             st.error("❌ Password must be at least 5 characters long.")
                         else:
                             try:
-                                con.execute("UPDATE admin_settings SET setting_value = ? WHERE setting_name = 'admin_password'", [new_pwd])
+                                con_rules.execute("UPDATE admin_settings SET setting_value = ? WHERE setting_name = 'admin_password'", [new_pwd])
                                 st.success("✅ Password updated successfully! Please re-enter your new password in the sidebar to keep Admin access.")
                             except Exception as e:
                                 st.error(f"Database error: {e}")
