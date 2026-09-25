@@ -21,9 +21,17 @@ def load_indicator_list():
 # Streamlit instantly loads this into memory without freezing the screen
 ALL_METRICS_LIST = load_indicator_list()
 
-
 # --- PAGE CONFIGURATION & CSS HACKS ---
 st.set_page_config(page_title="HMIS Anomalies", layout="wide", initial_sidebar_state="expanded")
+
+# --- CLEAN UI CSS INJECTION ---
+hide_streamlit_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # --- UNIFIED CUSTOM CSS: THE LOOKER STUDIO THEME & LAYOUT HACKS ---
 st.markdown("""
