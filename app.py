@@ -233,35 +233,30 @@ def init_rules_db():
             Operator VARCHAR, Logic_RHS VARCHAR, Show_Difference BOOLEAN
         )
     """)
-    return con_rules
-
-# Establish both connections for the app to use
-con_data = init_data_db()
-con_rules = init_rules_db()
     
     # --- STEP 1: DATABASE AUTO-MIGRATION FOR DIMENSIONS & MOM PATTERNS ---
-        try:
-            existing_cols = [row[1] for row in con_rules.execute("PRAGMA table_info('rules_metadata_v3')").fetchall()]
-            schema_additions = {
-                "Rule_Category": "VARCHAR DEFAULT 'Single Month'",
-                "Trend_Pattern": "VARCHAR DEFAULT 'None'",
-                "PHC_Area_Scope": "VARCHAR DEFAULT 'All'",
-                "Non_PHC_Ownership": "VARCHAR DEFAULT 'All'",
-                "Trend_Window_Months": "INTEGER DEFAULT 3",
-                "Trend_Threshold": "FLOAT DEFAULT 3.0"
-            }
-            for col_name, col_def in schema_additions.items():
-                if col_name not in existing_cols:
-                    con_rules.execute(f"ALTER TABLE rules_metadata_v3 ADD COLUMN {col_name} {col_def}")
-        except Exception as e:
-            pass
-            
-        # Create table for secure admin settings
-        con_rules.execute("""
-            CREATE TABLE IF NOT EXISTS admin_settings (
-                setting_name VARCHAR, setting_value VARCHAR
-            )
-        """)
+    try:
+        existing_cols = [row[1] for row in con_rules.execute("PRAGMA table_info('rules_metadata_v3')").fetchall()]
+        schema_additions = {
+            "Rule_Category": "VARCHAR DEFAULT 'Single Month'",
+            "Trend_Pattern": "VARCHAR DEFAULT 'None'",
+            "PHC_Area_Scope": "VARCHAR DEFAULT 'All'",
+            "Non_PHC_Ownership": "VARCHAR DEFAULT 'All'",
+            "Trend_Window_Months": "INTEGER DEFAULT 3",
+            "Trend_Threshold": "FLOAT DEFAULT 3.0"
+        }
+        for col_name, col_def in schema_additions.items():
+            if col_name not in existing_cols:
+                con_rules.execute(f"ALTER TABLE rules_metadata_v3 ADD COLUMN {col_name} {col_def}")
+    except Exception as e:
+        pass
+        
+    # Create table for secure admin settings
+    con_rules.execute("""
+        CREATE TABLE IF NOT EXISTS admin_settings (
+            setting_name VARCHAR, setting_value VARCHAR
+        )
+    """)
     
     # Insert default password if it doesn't exist yet
     pw_exists = con_rules.execute("SELECT * FROM admin_settings WHERE setting_name = 'admin_password'").fetchone()
@@ -270,6 +265,7 @@ con_rules = init_rules_db()
         
     return con_rules
 
+# Establish both connections for the app to use
 con_data = init_data_db()
 con_rules = init_rules_db()
 
