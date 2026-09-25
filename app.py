@@ -4,6 +4,9 @@ import duckdb
 import plotly.express as px
 import numpy as np
 from st_aggrid import AgGrid, GridOptionsBuilder
+import io
+import os
+from github import Github
 
 # 1. NEW CACHING FUNCTION: Loads the metrics from your text file only once
 @st.cache_data
@@ -206,6 +209,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+
+
 # =====================================================================
 # --- INITIALIZE DUCKDB DATABASES (SPLIT ARCHITECTURE) ---
 # =====================================================================
@@ -226,6 +231,8 @@ def init_data_db():
 @st.cache_resource
 def init_rules_db():
     con_rules = duckdb.connect("hmis_rules.duckdb")  
+    
+    # Create the base table
     con_rules.execute("""
         CREATE TABLE IF NOT EXISTS rules_metadata_v3 (
             Category_Code VARCHAR, Rule_ID VARCHAR, Rule_Description VARCHAR,
@@ -233,6 +240,16 @@ def init_rules_db():
             Operator VARCHAR, Logic_RHS VARCHAR, Show_Difference BOOLEAN
         )
     """)
+    
+    # --- 🚀 THE STEP 3 FIX: AUTO-LOAD GITHUB BACKUP IF DATABASE IS EMPTY ---
+    count = con_rules.execute("SELECT COUNT(*) FROM rules_metadata_v3").fetchone()[0]
+    if count == 0 and os.path.exists("rules_backup.xlsx"):
+        try:
+            df_backup = pd.read_excel("rules_backup.xlsx", engine="openpyxl")
+            con_rules.execute("INSERT INTO rules_metadata_v3 SELECT * FROM df_backup")
+        except Exception as e:
+            pass # Fails cleanly if the Excel file is somehow corrupted
+    # -------------------------------------------------------------------------
     
     # --- STEP 1: DATABASE AUTO-MIGRATION FOR DIMENSIONS & MOM PATTERNS ---
     try:
@@ -1524,7 +1541,8 @@ if is_admin:
                                 )
                                 st.session_state.clear_math_form = True
                                 st.session_state.admin_success = f"✅ Rule {new_rule_id} saved successfully! Form cleared."
-                                st.cache_data.clear()     
+                                st.cache_data.clear() 
+                                sync_rules_to_github()
                                 st.rerun()
                             except Exception as e:
                                 st.error(f"Database error: {e}")
@@ -1601,6 +1619,7 @@ if is_admin:
                                 st.session_state.clear_trend_form = True
                                 st.session_state.admin_success = f"✅ Trend Rule {new_rule_id} saved successfully! Form cleared."
                                 st.cache_data.clear()
+                                sync_rules_to_github()
                                 st.rerun()
                             except Exception as e:
                                 st.error(f"Database error: {e}")
@@ -1718,6 +1737,7 @@ if is_admin:
                                     
                                 st.session_state.admin_success = f"✅ Rule {rule_to_edit} in {edit_cat} updated successfully!"
                                 st.cache_data.clear()
+                                sync_rules_to_github()
                                 st.rerun()
                             except Exception as e:
                                 st.error(f"Error updating rule: {e}")
@@ -1731,6 +1751,7 @@ if is_admin:
                                     
                                 st.session_state.admin_success = f"🗑️ Rule {rule_to_edit} in {edit_cat} deleted permanently!"
                                 st.cache_data.clear()
+                                sync_rules_to_github()
                                 st.rerun()
                             except Exception as e:
                                 st.error(f"Error deleting rule: {e}")
