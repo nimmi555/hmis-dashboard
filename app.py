@@ -1478,6 +1478,10 @@ if is_admin:
                                         st.error(f"❌ Upload aborted for {file.name}: No 'Month' column found.")
                                         continue
                                         
+                                    # --- THE DATE FORMAT FIX ---
+                                    # This forces Excel dates (like 26-Jul) into your strict Drive format (Jul-2026)
+                                    df['Month'] = pd.to_datetime(df['Month']).dt.strftime('%b-%Y')
+                                        
                                     df['Financial_Year'] = upload_fy
                                     if 'Facility Code' in df.columns:
                                         df['Facility Code'] = df['Facility Code'].astype(str)
