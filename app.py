@@ -6,6 +6,10 @@ import numpy as np
 from st_aggrid import AgGrid, GridOptionsBuilder
 import io
 import os
+import json
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseUpload
 from github import Github
 
 # 1. NEW CACHING FUNCTION: Loads the metrics from your text file only once
@@ -240,6 +244,44 @@ def sync_rules_to_github():
             
     except Exception as e:
         st.error(f"GitHub Sync Failed: {e}")
+# =====================================================================
+# --- GOOGLE DRIVE DATA UPLOAD PIPELINE ---
+# =====================================================================
+def get_gdrive_service():
+    """Authenticates the robot account using Streamlit Secrets."""
+    import json
+    from google.oauth2 import service_account
+    from googleapiclient.discovery import build
+    
+    creds_json = st.secrets["google_credentials"]
+    creds_dict = json.loads(creds_json)
+    creds = service_account.Credentials.from_service_account_info(
+        creds_dict, 
+        scopes=["https://www.googleapis.com/auth/drive"]
+    )
+    return build('drive', 'v3', credentials=creds)
+
+def upload_to_drive_with_overwrite(file_buffer, file_name, mime_type):
+    """Deletes old data for the target month if it exists, then uploads the new data."""
+    from googleapiclient.http import MediaIoBaseUpload
+    service = get_gdrive_service()
+    folder_id = "1TK3CsZc_9xday99mbBYoLQCMBuVLrznQ" 
+    
+    # 1. Search Google Drive for an existing file with the exact same name
+    query = f"name='{file_name}' and '{folder_id}' in parents and trashed=false"
+    results = service.files().list(q=query, fields="files(id, name)").execute()
+    existing_files = results.get('files', [])
+    
+    # 2. Delete the old files to prevent duplicates
+    for existing in existing_files:
+        service.files().delete(fileId=existing['id']).execute()
+    
+    # 3. Upload the new file
+    file_metadata = {'name': file_name, 'parents': [folder_id]}
+    media = MediaIoBaseUpload(file_buffer, mimetype=mime_type, resumable=True)
+    uploaded_file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+    
+    return uploaded_file.get('id')
 
 # =====================================================================
 # --- INITIALIZE DUCKDB DATABASES (SPLIT ARCHITECTURE) ---
@@ -1367,113 +1409,67 @@ if is_admin:
         if admin_action == "📤 Upload HMIS Data":
             @st.fragment
             def render_upload_data():
-                st.markdown("### 📤 Upload & Replace Raw Data")
+                st.markdown("### ☁️ Smart Cloud Data Uploader")
+                st.info("The system automatically reads the 'Month' column in your files, splits the data, applies the Financial Year, and safely replaces old records in Google Drive.")
                 
-                # Local dropdowns specifically for uploading
-                col_fy, col_mo = st.columns(2)
-                with col_fy:
-                    upload_fy = st.selectbox("Select Financial Year for Upload:", ["2026-27"])
-                with col_mo:
-                    upload_months = [
-                        "Apr-2026", "May-2026", "Jun-2026", "Jul-2026", "Aug-2026", "Sep-2026", 
-                        "Oct-2026", "Nov-2026", "Dec-2026", "Jan-2027", "Feb-2027", "Mar-2027"
-                    ]
-                    # Changed to multi-select to support updating multiple months safely
-                    selected_upload_months = st.multiselect("Select Target Month(s) for Upload:", upload_months, default=["Apr-2026"])
+                # 1. UI: Only ask for Financial Year. The file tells us the rest.
+                upload_fy = st.selectbox("Select Financial Year to apply:", ["2026-27"])
                 
-                st.warning(f"⚠️ **Target Months:** You are uploading data for **{', '.join(selected_upload_months)} ({upload_fy})**. This action will **DELETE** any existing old data for these specific months and replace it with these new files.")
-                
-                # --- THE FIX: FORCE REBUILD CHECKBOX (Defaulted to False for safety) ---
-                force_rebuild = st.checkbox("⚠️ Force Database Reset (Check this box ONLY to permanently wipe the database and start over)", value=False)
-                
-                uploaded_files = st.file_uploader("Upload raw monthly/annual HMIS data files (CSV/Excel)", type=["csv", "xlsx"], accept_multiple_files=True)
+                uploaded_files = st.file_uploader("Upload HMIS Data File(s)", type=["xlsx", "csv"], accept_multiple_files=True)
                 
                 if uploaded_files:
-                    if st.button("🚀 Process & Replace Database", type="primary"):
-                        if not selected_upload_months:
-                            st.error("❌ Please select at least one Target Month from the dropdown.")
-                        else:
-                            with st.spinner("Processing massive dataset... please wait."):
-                                success_count = 0
-                                
-                                for file in uploaded_files:
-                                    try:
-                                        # Memory-safe file reading via local hard drive buffer
-                                        temp_file_path = f"temp_{file.name}"
-                                        with open(temp_file_path, "wb") as f:
-                                            f.write(file.getbuffer())
+                    if st.button("🚀 Process & Sync to Google Drive", type="primary"):
+                        with st.spinner("Reading months, splitting data, and replacing old files in Drive..."):
+                            for file in uploaded_files:
+                                try:
+                                    import pandas as pd
+                                    import io, os, re
+                                    
+                                    # Read file
+                                    if file.name.endswith('.csv'):
+                                        df = pd.read_csv(file)
+                                    else:
+                                        df = pd.read_excel(file)
                                         
-                                        if temp_file_path.endswith('.csv'):
-                                            df_raw = pd.read_csv(temp_file_path)
-                                        else:
-                                            df_raw = pd.read_excel(temp_file_path)
+                                    # Clean headers
+                                    def clean_header(c):
+                                        c = str(c).replace('\xa0', ' ').strip()
+                                        return re.sub(r'\s+', ' ', c)
+                                    df.columns = [clean_header(c) for c in df.columns]
+                                    
+                                    # Security Check: Ensure Month column exists
+                                    if 'Month' not in df.columns:
+                                        st.error(f"❌ Upload aborted for {file.name}: No 'Month' column found.")
+                                        continue
+                                        
+                                    # Inject Financial Year
+                                    df['Financial_Year'] = upload_fy
+                                    
+                                    if 'Facility Code' in df.columns:
+                                        df['Facility Code'] = df['Facility Code'].astype(str)
+                                        
+                                    # THE MAGIC: Split data by month and process individually
+                                    unique_months = df['Month'].dropna().unique()
+                                    
+                                    for month in unique_months:
+                                        df_month = df[df['Month'] == month]
+                                        
+                                        # Standardize filename so the robot can find and replace it
+                                        target_filename = f"HMIS_Data_{upload_fy}_{month}.csv"
+                                        
+                                        # Save locally to CSV (Converting everything to CSV saves massive space)
+                                        df_month.to_csv(target_filename, index=False)
+                                        
+                                        # Upload & Overwrite via API
+                                        with open(target_filename, "rb") as f:
+                                            file_id = upload_to_drive_with_overwrite(f, target_filename, "text/csv")
                                             
-                                        import os
-                                        if os.path.exists(temp_file_path):
-                                            os.remove(temp_file_path)
+                                        os.remove(target_filename)
+                                        st.success(f"✅ {month} data updated and replaced in Drive! (ID: {file_id})")
                                         
-                                        # --- DATA SANITIZER FOR HEADERS ---
-                                        import re
-                                        def clean_header(col_name):
-                                            c = str(col_name).replace('\xa0', ' ') # Destroy hidden ghost spaces
-                                            c = c.strip() # Remove invisible trailing/leading spaces
-                                            c = re.sub(r'\s+', ' ', c) # Fix accidental double-spaces
-                                            return c
-                                        
-                                        df_raw.columns = [clean_header(c) for c in df_raw.columns]
-                                        # -------------------------------------------
-                                        
-                                        # 2. Add required metadata variables
-                                        df_raw['Financial_Year'] = upload_fy
-                                        
-                                        # Assign month logic: if single month selected, apply it; if multiple, expect file to have its own Month column
-                                        if len(selected_upload_months) == 1:
-                                            df_raw['Month'] = selected_upload_months[0]
-                                        elif 'Month' not in df_raw.columns:
-                                            st.error(f"❌ Error: {file.name} does not contain a 'Month' column, but you selected multiple target months. Please upload files individually or ensure a Month column is present.")
-                                            continue
-                                        
-                                        # 3. Convert Facility Code to string
-                                        if 'Facility Code' in df_raw.columns:
-                                            df_raw['Facility Code'] = df_raw['Facility Code'].astype(str)
-                                        
-                                        # 4. Smart Database Merge Logic
-                                        try:
-                                            # If the user explicitly checked the full reset box on the first file
-                                            if force_rebuild and success_count == 0:
-                                                con_data.execute("DROP TABLE IF EXISTS hmis_master_data")
-                                                
-                                            current_cols = con_data.execute("DESCRIBE hmis_master_data").fetchdf()
-                                            
-                                            # Blow up old mock table if it exists (fewer than 50 columns)
-                                            if len(current_cols) < 50:
-                                                con_data.execute("DROP TABLE IF EXISTS hmis_master_data")
-                                                con_data.execute("CREATE TABLE hmis_master_data AS SELECT * FROM df_raw")
-                                            else:
-                                                # If this is the first file in the loop, safely wipe ONLY the targeted months
-                                                if success_count == 0 and not force_rebuild:
-                                                    for target_mo in selected_upload_months:
-                                                        con_data.execute("DELETE FROM hmis_master_data WHERE Financial_Year = ? AND Month = ?", [upload_fy, target_mo])
-                                                
-                                                db_columns = con_data.execute("SELECT * FROM hmis_master_data LIMIT 0").fetchdf().columns
-                                                for col in db_columns:
-                                                    if col not in df_raw.columns:
-                                                        df_raw[col] = None 
-                                                df_raw = df_raw[db_columns]
-                                                con_data.execute("INSERT INTO hmis_master_data SELECT * FROM df_raw")
-                                                
-                                        except Exception as e:
-                                            # If table completely doesn't exist, create it cleanly!
-                                            con_data.execute("CREATE TABLE hmis_master_data AS SELECT * FROM df_raw")
-                                            
-                                        success_count += 1
-                                    except Exception as e:
-                                        st.error(f"❌ Error processing {file.name}: {e}")
-                            
-                                if success_count > 0:
-                                    st.success(f"✅ Successfully processed {success_count} new file(s) into the Master Database! (Columns matched: {len(df_raw.columns)})")
-                                    st.balloons()
-                                    st.cache_data.clear()
+                                except Exception as e:
+                                    st.error(f"❌ Failed processing {file.name}: {e}")
+                                    
             render_upload_data()
 
         elif admin_action == "🧮 Add New Rule":
