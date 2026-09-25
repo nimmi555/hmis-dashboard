@@ -1,0 +1,525 @@
+1.1 :: Total number of NEW Pregnant Women registered for ANC
+1.1.a :: Out of total number of NEW Pregnant Women registered with age less than <15 years
+1.1.b :: Out of total number of NEW Pregnant Women registered with age 15-19 years
+1.1.c :: Out of total number of NEW Pregnant Women registered with age more than >19 to 49 years
+1.1.d :: Out of total number of NEW Pregnant Women registered with age more than >49 years
+1.1.1 :: Out of the total NEW ANC registered, number registered within 1st trimester (within 12 weeks)
+1.1.2 :: Total ANC footfall/cases (Old cases + New Registration) attended
+1.2.1 :: Number of PW given Td1 (Tetanus Diptheria dose 1)
+1.2.2 :: Number of PW given Td2 (Tetanus Diptheria dose 2)
+1.2.3 :: Number of PW given Td Booster (Tetanus Diptheria dose booster)
+1.2.4 :: Number of PW provided full course 180 Iron Folic Acid (IFA) tablets
+1.2.5 :: Number of PW provided full course 360 Calcium tablets
+1.2.6 :: Number of PW given one Albendazole tablet after 1st trimester
+1.2.7 :: Number of PW received 4 or more ANC check ups
+1.2.8 :: Number of PW given ANC Corticosteroids in Pre-Term Labour
+1.3.1 :: New cases of PW with hypertension detected
+1.3.2 :: Number of PW with hypertension managed at institution
+1.3.3. :: Number of New Pre-Eclampsia/Eclampsia cases identified
+1.3.4 :: Number of Pre-Eclampsia/Eclampsia cases managed during ANC
+1.3.5 :: Number of Eclampsia cases managed during delivery
+1.4.1. :: Number of PW tested for Haemoglobin (Hb) 4 or more than 4 times for respective ANCs
+1.4.2. :: Number of PW tested for Haemoglobin (Hb)
+1.4.3. :: Number of PW having Hb level<11(7.1 to 10.9 g/dl) (Out of total tested cases)
+1.4.4. :: Number of PW having Hb level<=7 g/dl (Out of total tested cases)
+1.4.5. :: Number of PW treated for severe anaemia (Hb<=7g/dl) (including referred-in cases)
+1.5.1. :: Number of PW tested for Blood Sugar using OGTT(Oral Glucose Tolerance Test)
+1.5.2. :: Number of PW tested positive for GDM out of total OGTT(Oral Glucose Tolerance Test) conducted
+1.5.3. :: Number of GDM positive PW managed with Insulin/Metformin out of total tested positive for GDM
+1.6.1.a :: Number of pregnant/Direct-In-Labor (DIL) women screened/tested (with VDRL/RPR/TPHA/RDT/PoC) for Syphilis
+1.6.1.b :: Number of pregnant/DIL women found Seropositive for Syphilis by VDRL/RPR/TPHA/RDT/PoC test
+1.6.1.c :: Number of pregnant/DIL women found Syphilis-Seropositive and given treatment with injection Benzathine Penicillin (IM)
+1.6.1.d :: Number of live births among Syphilis Seropositive Pregnant Women
+1.6.1.e :: Number of babies born to Syphilis-Seropositive Pregnant Women tested positive/ clinically diagnosed for congenital Syphilis
+1.6.1.f :: Out of above, babies with congenital Syphilis received curative treatment
+1.7.1. :: Number of Pregnant Women tested positive for Thyroid disorder
+1.7.2. :: Number of Pregnant Women treated for thyroid disorder
+1.8.1. :: Number of Pregnant Women screened for TB
+1.8.2. :: Number of Pregnant Women identified with Presumptive TB symptoms
+1.8.3. :: Number of Pregnant Women referred out of those identified with Presumptive TB symptoms
+1.9.1. :: Total High Risk Pregnancy (HRP) Intrapartum including following:
+1.9.1.a. :: Number of Pregnant Women only with Post-Partum Haemorrhage(Immediately after delivery) in the facility
+1.9.1.b. :: Number of Pregnant Women only with Sepsis in the facility
+1.9.1.c. :: Number of Pregnant Women identified only with Eclampsia in the facility
+1.9.1.d. :: Number of Pregnant Women identified only with obstructed labour in the facility
+1.9.1.e. :: Number of Pregnant Women identified with more than 1 complication listed above
+1.9.2. :: Total High Risk Pregnancy (HRP) Antepartum (Only New Cases are to be reported)
+1.9.3. :: Total no. of highrisk ANC cases referred to Higher/ any other facility (Referred out)
+1.9.3.a. :: Total no. of Intrapartum/PNC High Risk Pregnancy cases referred to Higher/ any other facility (Referred out)
+1.9.4. :: Total no. of highrisk ANC cases referred in to the facility (Referred in)
+1.9.4.a. :: Total no. of Intrapartum/PNC High Risk Pregnancy cases attended or referred into the facility (Referred in)
+2.1.1.a :: Number of Home Deliveries attended by Skill Birth Attendant(SBA) (Doctor/Nurse/ANM)
+2.1.1.b :: Number of Home Deliveries attended by Non SBA
+2.1.2. :: Number of PW given Tablet Misoprostol during home delivery
+2.2. :: Number of Institutional Deliveries conducted (Including C-Sections)
+2.2.1. :: Out of total institutional deliveries(excluding C-section), number of women stayed for 48 hours or more after delivery
+2.2.2. :: Out of total Institutional deliveries, number of Institutional Deliveries (Excluding C-Sections) conducted at night (8 PM- 8 AM)
+2.2.3. :: Out of total Institutional deliveries, number of institutional deliveries conducted at Midwifery Led Care Unit (MLCU)
+2.3.1. :: Out of total number of delivery, PW with age less than <15 years
+2.3.2. :: Out of total number of delivery, PW with age 15-19 years
+2.3.3. :: Out of total number of delivery, PW with age more than >19-49 years
+2.3.4. :: Out of total number of delivery, PW with age more than > 49 years
+2.4. :: Number of newborns received 6/7 HBNC visits after Delivery (Home+ Institutional)
+2.5. :: No. of identified Sick new-borns referred by ASHA to facility under HBNC Programme
+2.6. :: Total number of Children received all scheduled 5 Home visits under HBYC
+3.1. :: Total number of C -Section deliveries performed
+3.1.1. :: Out of total C-sections, number performed at night (8 PM- 8 AM)
+3.1.2. :: Out of total C-section, number of women stayed for 72 hours or more after delivery
+4.1.1.a :: Live Birth - Male
+4.1.1.b :: Live Birth - Female
+4.1.2. :: Number of Pre-term newborns ( < 37 weeks of pregnancy)
+4.1.3.a :: Fresh Stillbirth - Intrapartum Stillbirth (28 weeks & above)
+4.1.3.b :: Mascerated Stillbirth – Antepartum Stillbirth (28 weeks &above)
+4.1.3.c :: Foetal Death (24–27 completed weeks)
+4.2. :: Abortion (spontaneous)
+4.3.1.a :: Surgical MTPs upto 12 weeks of pregnancy
+4.3.1.b :: MTP more than 12 weeks of pregnancy
+4.3.1.c :: MTPs completed through Medical methods of abortion (MMA)
+4.3.2.a :: Total Post-abortion/MTP Complications Identified
+4.3.2.b. :: Post-abortion/MTP complications identified (where abortions were carried out in facilities other than public and accredited private health facilities)
+4.3.2.c. :: Post-abortion/MTP Complications treated
+4.3.3. :: Number of women provided with Post-abortion/ MTP contraception
+4.4.1. :: Number of Newborns weighed at birth
+4.4.2. :: Number of Newborns having weight less than 2500 gms
+4.4.2.a :: Out of the above, number of Newborns having weight less than 1800 gms
+4.4.3. :: Number of Newborns breast fed within 1 hour of birth
+4.4.4. :: No. of Newborns discharged from the facility were exclusively breastfed till discharge
+4.4.5 :: Number of Newborns received Donor Human Milk (DHM) in the facility
+4.5.1. :: Number of Newborns screened for defects at birth (as per Comprehensive Newborn Screening, RBSK)
+4.5.1.a :: Number of Newborns identified with visible birth defects (including Neural tube defect, Down’s Syndrome, Cleft Lip & Palate, Club foot and Developmental dysplasia of the hip)
+4.5.3. :: Number of SNCU discharged babies screened in DEIC
+4.5.5. :: Number of children till age 18 years (affected with selected health conditions) managed for 4 Ds (Disease, Deficiency, Developmental Delay & Defect)
+4.5.6. :: Number of children till age 18 years (affected with selected health conditions) managed by Intervention - Surgical
+4.5.7. :: Number of children till age 18 years managed at DEIC (District Early Intervention Centre)
+5.1.1. :: Number of women of reproductive age (WRA) 20-49 years (non-pregnant, non-lactating), provided 4 Red Iron and folic acid (IFA) tablets in a month
+5.1.2. :: Number of children (6-59 months old) provided 8-10 doses (1ml) of IFA syrup (Bi weekly)
+5.1.3.a :: Number of out of school children (5 -9 years) given 4-5 IFA Pink tablets at Anganwadi Centres
+5.2.1.c :: Number of out of school adolescent girls (10-19 years) having anaemia (Hb 8.1-11.9 g/dl)
+5.2.1.e. :: Number of lactating mothers (of 0-6 months old child) having anaemia (Hb 8.1-11.9 g/dl)
+5.2.1.f. :: Number of women of reproductive age (non-pregnant, non-lactating) (20-49 years) having anaemia (Hb 8.1-11.9 g/dl)
+5.2.2.c :: Number of out of school adolescent girls (10-19 years) having severe anaemia (Hb <8 g/dl)
+5.2.2.e :: Number of lactating mothers (of 0-6 months old child) having severe anaemia (Hb <8 g/dl)
+5.2.2.f :: Number of women of reproductive age (non-pregnant, non-lactating) (20-49 years) having severe anaemia (Hb <8 g/dl)
+5.2.3.a :: Number of anaemic in-school Children (5-9 years) put on treatment
+5.2.3.b :: Number of anaemic in-school adolescent girls (10-19 years) put on treatment
+5.2.3.c :: Number of anaemic out of school adolescent girls (10-19 years) put on treatment
+5.2.3.d :: Number of anaemic in-school adolescent boys (10-19 years) put on treatment
+5.2.3.e :: Number of anaemic lactating mothers (of 0-6 months old child) put on treatment
+5.2.3.f :: Number of anaemic women of reproductive age (non-pregnant, non-lactating) (20-49 years) put on treatment
+5.2.4.a :: Number of lactating mothers (of 0-6 months old child) diagnosed with severe anaemia and put on treatment
+6.1. :: In case of home delivery, number of women receiving 1st Postpartum checkups within 48 hours
+6.2. :: Number of women receiving Postpartum checkup between 48 hours and 14 days after Institutional delivery
+6.3. :: Number of mothers provided full course of 180 IFA tablets after delivery
+6.4. :: Number of mothers provided full course 360 Calcium tablets after delivery
+6.5. :: Total No of High Risk Mothers identified during Post Natal Period
+6.6. :: Out of above identified number of High Risk Mothers managed (including referred in cases)
+7.1.1. :: Number of males assessed for STI/RTI
+7.1.1.a :: Out of the above, number of males diagnosed with STI/RTI
+7.1.1.b :: Out of the above, number of males treated for STI/RTI
+7.1.2. :: Number of females (all females) assessed for STI/RTI
+7.1.2.a :: Out of the above, number of females (all females) diagnosed with STI/RTI
+7.1.2.b :: Out of the above, number of females (all females) treated for STI/RTI
+7.1.3. :: Number of H/TG assessed for STI/RTI
+7.1.3.a :: Out of the above, number of H/TG people diagnosed with STI/RTI
+7.1.3.b :: Out of the above, number of H/TG people treated for STI/RTI
+8.1.1. :: Number of Non Scalpel Vasectomy (NSV) / Conventional Vasectomy conducted
+8.2.1. :: Number of Laparoscopic sterilizations (excluding post-abortion) conducted
+8.2.2. :: Number of Interval sterilizations (Mini-lap/Conventional) (other than post-partum and post abortion) conducted
+8.2.3. :: Number of Postpartum sterilizations (within 7 days of delivery by minilap or concurrent with caesarean section) conducted
+8.2.4. :: Number of Post-abortion sterilizations (within 7 days of spontaneous or surgical abortion) conducted
+8.3. :: Number of Interval IUCD Insertions (excluding PPIUCD and PAIUCD)
+8.4. :: Number of Postpartum (within 48 hours of delivery) IUCD insertions
+8.5. :: Number of Post-abortion (within 12 days of spontaneous or surgical abortion) IUCD insertions
+8.6. :: Number of IUCD Removals
+8.7. :: Number of complications following IUCD Insertion
+8.8.1. :: Injectable Contraceptive MPA (Intra Muscular) - First Dose
+8.8.2. :: Injectable Contraceptive MPA (Sub Cutaneous) - First Dose
+8.9.1. :: Injectable Contraceptive MPA (Intra Muscular) - Second Dose
+8.9.2. :: Injectable Contraceptive MPA (Sub Cutaneous)- Second Dose
+8.10.1. :: Injectable Contraceptive MPA (Intra Muscular) - Third Dose
+8.10.2. :: Injectable Contraceptive MPA (Sub Cutaneous)- Third Dose
+8.11.1. :: Injectable Contraceptive MPA (Intra Muscular) - Fourth and above Dose
+8.11.2. :: Injectable Contraceptive MPA (Sub Cutaneous)- Fourth and above Dose
+8.12. :: Number of Combined Oral Pill cycles distributed to the beneficiary
+8.13. :: Number of Condom pieces distributed to the beneficiary
+8.14. :: Number of Centchroman (weekly) pill strips distributed to the beneficiary
+8.15. :: Number of Emergency Contraceptive Pills (ECP) given to the beneficiary
+8.16. :: Number of Pregnancy Test Kits (PTK) utilized
+8.17.1 :: No. of Subdermal Contraceptive Implant inserted
+8.17.2 :: No. of Subdermal Contraceptive Implant removed
+8.18.1. :: Complications following male sterilization
+8.18.2. :: Complications following female sterilization
+8.18.3. :: Failures following male sterilization
+8.18.4. :: Failures following female sterilization
+8.18.5. :: Deaths following male sterilization
+8.18.6. :: Deaths following female sterilization
+8.19.1. :: Number of cases of Female Sterilization followed up (after 1 month or on the resumption of her menstrual cycle whichever is earlier)
+8.19.2. :: Number of cases of Male Sterilization followed up (after 3 months)
+9.1.1. :: Child immunisation - Vitamin K (Birth Dose)
+9.1.2. :: Child immunisation - BCG
+9.1.3. :: Child immunisation - Pentavalent 1
+9.1.4. :: Child immunisation - Pentavalent 2
+9.1.5. :: Child immunisation - Pentavalent 3
+9.1.6. :: Child immunisation - OPV 0 (Birth Dose)
+9.1.7. :: Child immunisation - OPV1
+9.1.8. :: Child immunisation - OPV2
+9.1.9. :: Child immunisation - OPV3
+9.1.10. :: Child immunisation - Hepatitis-B0 (Birth Dose)
+9.1.11. :: Child immunisation - Inactivated Injectable Polio Vaccine 1 (IPV 1)
+9.1.12. :: Child immunisation - Inactivated Injectable Polio Vaccine 2 (IPV 2)
+9.1.13. :: Child immunisation - Rotavirus 1
+9.1.14. :: Child immunisation - Rotavirus 2
+9.1.15. :: Child immunisation - Rotavirus 3
+9.1.16. :: Child immunisation - PCV1
+9.1.17. :: Child immunisation - PCV2
+9.2.1. :: Child immunisation(9 - 11 months) - Inactivated Injectable Polio Vaccine 3 (IPV 3)
+9.2.2. :: Child immunisation (9-11months) - Measles & Rubella (MR)/Measles containing vaccine(MCV) - 1st Dose
+9.2.3. :: Child immunisation (9-11months) - JE 1st dose
+9.2.4. :: Child immunisation - PCV Booster
+9.2.5.a :: FULLY IMMUNIZED children aged between 9 and <12 months- Male
+9.2.5.b :: FULLY IMMUNIZED children aged between 9 and <12 months- Female
+9.3.1. :: Child immunisation(after 12 months-delayed vaccination) - Measles & Rubella (MR)/Measles containing vaccine(MCV)- 1st Dose
+9.3.2. :: Child immunisation (after 12 months-delayed vaccination) - JE 1st dose
+9.3.3. :: Child immunisation - DPT 1 after 12 months of age (delayed vaccination)
+9.3.4. :: Child immunisation - DPT 2 after 12 months of age (delayed vaccination)
+9.3.5. :: Child immunisation - DPT 3 after 12 months of age (delayed vaccination)
+9.3.6. :: Child immunisation - DPT Booster after 24 months of age (delayed vaccination)
+9.3.7. :: Child immunisation - OPV Booster after 24 months of age (delayed vaccination)
+9.3.8. :: Child immunisation - JE Booster after 24 months of age (delayed vaccination)
+9.4.1. :: Child immunisation - Measles & Rubella (MR)/ Measles containing vaccine(MCV)- 2nd Dose (16-24 months)
+9.4.2. :: Child immunisation - DPT 1st Booster
+9.4.3. :: Child immunisation - OPV Booster
+9.4.4. :: Number of children more than 16 months of age who received Japanese Encephalitis (JE) vaccine- 2nd dose (16-24 months)
+9.5.1. :: Child Immunization- Typhoid
+9.5.2. :: Children more than 5 years received DPT5 (2nd Booster)
+9.5.3. :: Children more than 10 years received Td10 (Tetanus Diptheria10)
+9.5.4. :: Children more than 16 years received Td16 (Tetanus Diptheria16)
+9.6.1. :: Number of cases of AEFI -Minor (eg.- fever, rash, pain etc)
+9.6.2. :: Number of cases of AEFI - Severe (eg.- anaphylaxis, fever>102 degrees, not requiring hospitalization etc.)
+9.6.3. :: Number of cases of AEFI - Serious (eg.- hospitalization, death, disability , cluster etc.)
+9.6.3.a :: Out of Number of cases of AEFI - Serious , total number of AEFI deaths
+9.7.1. :: Immunisation sessions planned
+9.7.2. :: Immunisation sessions held
+9.8.1. :: Child immunisation - Vitamin A Dose - 1
+9.8.2. :: Child immunisation - Vitamin A Dose - 5
+9.8.3. :: Child immunisation - Vitamin A Dose - 9
+10.1.1. :: Childhood Diseases - Pneumonia
+10.1.2. :: Childhood Diseases - Asthma
+10.1.3. :: Childhood Diseases - Sepsis
+10.1.4. :: Childhood Diseases - Diphtheria
+10.1.5. :: Childhood Diseases - Pertussis
+10.1.6. :: Childhood Diseases - Tetanus Neonatorum
+10.1.7. :: Childhood Diseases - Tuberculosis (TB)
+10.1.8. :: Childhood Diseases - Acute Flaccid Paralysis(AFP)
+10.1.9. :: Childhood Diseases - Measles
+10.1.10. :: Childhood Diseases - Malaria
+10.1.11. :: Childhood Diseases - Diarrhoea
+10.1.12. :: Childhood Diseases - Diarrhoea treated with ORS
+10.1.13. :: Childhood Diseases - Diarrhoea treated with Zinc for 14 days
+10.1.14. :: Childhood Diseases -Leprosy Cases
+10.1.15. :: Childhood Diseases- Leprosy with Grade II disability
+10.2.1. :: Children admitted with Respiratory Infections
+10.2.2. :: Children admitted with Pneumonia
+10.2.3. :: Children admitted with Diarrhoea
+11.1.1.a :: Total Blood Smears Examined for Malaria
+11.1.1.b :: Malaria (Microscopy Tests ) - Plasmodium Vivax test positive
+11.1.1.c :: Malaria (Microscopy Tests ) - Plasmodium Falciparum test positive
+11.1.1.d :: Malaria (Microscopy Tests ) - Mixed test positive
+11.1.2.a :: RDT conducted for Malaria
+11.1.2.b :: Malaria (RDT) - Plasmodium Vivax test positive
+11.1.2.c :: Malaria (RDT) - Plasmodium Falciparum test positive
+11.1.2.d :: Malaria (RDT) - Mixed test positive
+11.2.1. :: Kala Azar (RDT) - Tests Conducted
+11.2.2. :: Kala Azar Positive Cases
+11.3.1. :: Dengue - Enzyme- Linked Immuno Sorbent Assay (ELISA) test conducted
+11.3.2. :: Dengue - Enzyme- Linked Immuno Sorbent Assay (ELISA) test found positive
+11.3.3. :: Chikungunya Enzyme- Linked Immuno Sorbent Assay (ELISA) test conducted
+11.3.4. :: Chikungunya Enzyme- Linked Immuno Sorbent Assay (ELISA) test found positive
+11.4.1. :: No. of AES cases tested for JE(IgM ELISA)
+11.4.2. :: No. of JE positive cases
+11.5.1. :: Number of persons that consumed MDA(Mass Drug Administration) drugs during the MDA round
+11.5.2. :: Number of Lymphatic Filarisis lymphoedema patients received MMDP (Morbidity Management And Disability Prevention) kits
+11.5.3. :: Number of Hydrocele surgeries conducted in Lymphatic Filariasis (MMDP)
+12.1.1.a :: Girls registered in AFHC
+12.1.1.b :: Boys registered in AFHC
+12.1.2.a :: Out of Girls registered, Girls received clinical services
+12.1.2.b :: Out of Boys registered, Boys received clinical services
+12.1.3.a :: Out of Girls registered, Girls received counselling
+12.1.3.b :: Out of Boys registered, Boys received counselling
+12.3.1. :: Number of adolescent girls provided sanitary napkin packs by ASHA
+12.3.2. :: Number of sanitary napkin packs distributed free to ASHA (for her personal use)
+12.3.3. :: Number of adolescent girls attended monthly meeting
+12.3.4. :: Number of adolescent girls provided sanitary napkin packs by State/UT supported Menstrual Hygiene Scheme (MHS)
+12.4.1. :: Number of Peer Educators selected
+12.4.2. :: Out of the selected Peer Educators, numbers trained
+12.4.3. :: Number of Adolescent Health & Wellness Days organized
+12.4.4. :: Number of Adolescent Friendly Club Meetings organized
+13.1. :: Number of beneficiaries who are registered at the ICTC centre.
+13.2. :: Of the number registered at ICTC centre, the number presumptive TB cases identified and referred for TB testing and diagnosis
+13.3. :: Number of beneficiaries who are registered at the NCD clinic.
+13.4. :: The number registered at the NCD clinic includes the number of presumptive TB cases identified and referred for TB testing and diagnosis
+14.1.1.a :: Total number of geriatric/elderly patients (age>=60 yrs) Registered
+14.1.1.b :: Geriatric (age>=60 yrs) patients footfall
+14.1.1.c :: Number of geriatric/elderly persons who underwent Comprehensive Geriatric Assessment by CHO
+14.1.1.d :: Number of geriatric/elderly persons managed for any elderly conditions
+14.1.1.e :: Number of geriatric/elderly persons followed-up for any elderly conditions
+14.1.1.f :: Number of geriatric/elderly patients (age>=60 yrs) provided physiotherapy services
+14.1.1.g :: Number of home bound (bed bound & restricted mobility) elderly and single elderly visited by ASHA & ANM/MPW-M during the month
+14.1.1.h :: Number of elderly support groups-‘Sanjeevini’ created during the month
+14.1.1.i :: Number of weekly geriatric clinics organized during the month
+14.1.1.j :: Number of fixed day rehabilitation services provided during the month
+14.1.2.a. :: Number of patients provided physiotherapy services
+14.1.2.b. :: Number of Palliative Patients visited at home
+14.1.2.c. :: Number of visits for home care/ end of life care provided by AAM-PHC team
+14.1.2.d. :: Number of weekly palliative care OPD conducted at AAM-PHC
+14.1.2.e. :: Number of cases reported for Self Harm
+14.1.3.a :: Total number of footfall in outreach camps/sessions
+14.1.3.b :: Total number cases examined in outreach camps for Mental illness
+14.1.4. :: Number of psychoeducation sessions conducted at the Ayushman Arogya Mandir during the month
+14.2.1. :: Allopathic- Outpatient attendance
+14.2.1.a :: Out of above, number of specialist Allopathic OPD services provided
+14.2.2. :: Ayush - Outpatient attendance
+14.2.2.b :: Out of above, number of specialist AYUSH OPD services provided
+14.3.1.a :: IPD Admission Male- Children<18yrs
+14.3.1.b :: IPD Admission Male- Adults <60yrs
+14.3.1.c :: IPD Admission Female- Children<18yrs
+14.3.1.d :: IPD Admission Female- Adults<60yrs
+14.3.1.e :: IPD Admission Geriatric->=60yrs
+14.3.2.a :: IPD Discharge Male- Children<18yrs
+14.3.2.b :: IPD Discharge Male- Adults<60yrs
+14.3.2.c :: IPD Discharge Female- Children<18yrs
+14.3.2.d :: IPD Discharge Female- Adults<60yrs
+14.3.2.e :: IPD Discharge Geriatric->=60yrs
+14.3.3.a :: IPD Referred Male- Children<18yrs
+14.3.3.b :: IPD Referred Male- Adults<60yrs
+14.3.3.c :: IPD Referred Female- Children<18yrs
+14.3.3.d :: IPD Referred Female- Adults<60yrs
+14.3.3.e :: IPD Referred Geriatric->=60yrs
+14.3.4.a :: IPD Deaths Male- Children<18yrs
+14.3.4.b :: IPD Deaths Male- Adults<60yrs
+14.3.4.c :: IPD Deaths Female- Children<18yrs
+14.3.4.d :: IPD Deaths Female- Adults<60yrs
+14.3.4.e :: IPD Deaths Geriatric->=60yrs
+14.3.5.a :: Total cases Referred out (OPD+IPD+Emergency)-During Day
+14.3.5.b :: Total cases Referred out (OPD+IPD+Emergency)-At Night (8 PM- 8 AM)
+14.3.6. :: Day Care Admissions
+14.3.7.a :: Number of Total Left Against Medical Advice (LAMA) cases reported at the facility
+14.3.7.b :: Number of delivery LAMA cases reported at the facility
+14.3.8 :: Total number of Medico Legal Cases reported at the facility
+14.3.9 :: Total number of postmortem conducted at the facility
+14.3.10. :: Total number of telemedicine consultation provided
+14.4.1. :: Inpatient - Malaria
+14.4.2. :: Inpatient - Dengue
+14.4.3. :: Inpatient - Typhoid
+14.4.4. :: Inpatient - Asthma, Chronic Obstructive Pulmonary Disease (COPD), Respiratory infections
+14.4.5. :: Inpatient - Tuberculosis
+14.4.6. :: Inpatient - Pyrexia of unknown origin (PUO)
+14.4.7. :: Inpatient - Diarrhoea with dehydration
+14.4.8. :: Inpatient – Leprosy (Reconstructive Surgery)
+14.4.9. :: Inpatient – Operated for Cataract
+14.4.10. :: Inpatient – Palliative Care
+14.4.11. :: Inpatient – Mental illness
+14.5.1. :: Patients registered at Emergency Department
+14.5.2. :: No. of Emergencies managed at night (8 PM- 8 AM)
+14.5.3. :: Total Number of Emergency cases managed
+14.5.4. :: Total Number of Emergency cases referred out
+14.5.5. :: Total Number of CPR performed in the emergency
+14.6.1.a :: Emergency - Trauma ( accident, injury, poisoning etc) -Admission
+14.6.1.b :: Emergency - Trauma ( accident, injury, poisoning etc) -Deaths
+14.6.2.a :: Emergency - Burn -Admission
+14.6.2.b :: Emergency - Burn -Deaths
+14.6.3.a :: Emergency - Obstetrics complications -Admission
+14.6.3.b :: Emergency - Obstetrics complications -Deaths
+14.6.4.a :: Emergency - Snake Bite -Admission
+14.6.4.b :: Emergency - Snake Bite -Deaths
+14.6.5.a :: Emergency - Acute Cardiac Emergencies -Admission
+14.6.5.b :: Emergency - Acute Cardiac Emergencies -Deaths
+14.6.6.a :: Emergency - CVA (Cerebrovascular Disease)/Stroke -Admission
+14.6.6.b :: Emergency - CVA (Cerebrovascular Disease)/Stroke -Deaths
+14.6.7.a :: Emergency - Dog Bite -Admission
+14.6.7.b :: Emergency - Dog Bite -Deaths
+14.7. :: Total number of deaths occurring at Emergency Department
+14.8.1.a :: Total number of Major Operations conducted excluding C-Section (General and spinal anaesthesia)
+14.8.1.b :: Out of Major Operation, Gynecology- Hysterectomy surgeries
+14.8.1.c :: Major Surgeries excluding Obstetrics, Gynaecology and Opthalmology.
+14.8.1.d :: No. of Major Surgeries done at night (8PM to 8 AM) (Excluding C section)
+14.8.2. :: Minor Operations (No or local anaesthesia)
+14.9. :: Number of post operative Surgical Site infection
+14.10. :: In-Patient Head Count at midnight
+14.11.1 :: Number of Admission in NBSU ( New Born Stabilisation Unit)
+14.11.2. :: Number of total admissions in Special Newborn Care Unit (SNCU Admissions)
+14.12.1 :: Number of deaths occurred at SNCU
+14.12.2 :: Number of Newborns successfully discharged from SNCU
+14.13.1.a.i :: Number of pregnant women provided free medicines during ANC period under JSSK
+14.13.1.a.ii :: Number of Pregnant women provided free medicines during delivery under JSSK
+14.13.1.a.iii :: Number of PNC mothers provided free medicines under JSSK
+14.13.1.b :: Number of women provided - Free Diet under JSSK
+14.13.1.c.i :: Number of pregnant women provided free diagnostics during ANC period under JSSK
+14.13.1.c.ii :: Number of Pregnant women provided free diagnostics during delivery under JSSK
+14.13.1.c.iii :: Number of PNC mothers provided free diagnostics under JSSK
+14.13.1.d :: Number ofpregnant women provided - Free Home to facility transport for conducting delivery under JSSK
+14.13.1.e :: Number of pregnant women provided - Interfacility transfers when needed during delivery under JSSK(in case of referral)
+14.13.1.f :: Number of PNC mothers provided - Free Drop Back home after delivery under JSSK
+14.13.2.a :: Number of infants admitted at facility due to any sickness- JSSK Beneficiaries
+14.13.2.b :: Number of sick infants provided - Free Medicines under JSSK
+14.13.2.c :: Number of sick infants provided - Free Diagnostics under JSSK
+14.13.2.d :: Number of sick infants provided - Free Home to facility transport under JSSK
+14.13.2.e :: Number of infants received free referral transport under JSSK
+14.14.1. :: Number of sick SAM children admitted in standalone/ integrated NRC
+14.14.2. :: Number of sick SAM children referred to standalone/ integrated NRC by Frontline Workers (AWW/ ASHA/ ANM)
+14.14.3. :: Number of sick SAM children referred to standalone/ integrated NRC from IPD/OPD of other Health Facility (PHC/CHC/SDH/DH/other NRC)
+14.14.4. :: Number of children Referred to standalone/ integrated NRC by RBSK Team
+14.14.5. :: Number of SAM children discharged from standalone/ integrated NRC who met the discharge criteria
+14.14.6. :: Number of admitted children left against medical advice (LAMA) / defaulter
+14.14.7. :: Number of children died while admitted in standalone/ intergrated NRC
+14.14.8. :: Number of children who completed all four post discharge follow-ups
+14.14.9. :: Number of sick SAM children treated and admitted in the pediatric facility (other than standalone/ integrated NRC)
+14.14.10. :: In-Patient Head Count at midnight for standalone/ integrated NRC
+14.15.1. :: Number of Rogi Kalyan Samiti (RKS) meetings held
+14.15.2. :: Number of Jan Arogya Samiti (JAS) meetings held
+14.16. :: Number of Anganwadi centres reported to have conducted atleast one Village Health & Nutrition Day (VHNDs)/UHND/ Outreach / Special Outreach sessions
+14.17. :: Total number of UHND/VHND sessions conducted in the reporting month
+14.18. :: Total number of Outreach/Special Outreach camps conducted in the reporting month
+14.18.1. :: Total number of outreach visits conducted by staff
+14.18.2. :: Total number of outreach visits made by DMHP team
+14.18.3 :: Total number of awareness campaigns/camps conducted for Mental Health
+14.19. :: Patient Satisfaction Score of the facility in percentage (from Mera Aspatal)
+14.20.1.a :: Total number of blood samples screened by ELISA/Rapid tests for viral hepatitis A (IgM Anti- HAV)
+14.20.1.b :: Total number of blood samples screened by ELISA/Rapid tests for viral hepatitis B i.e. HBsAg (excluding pregnant women)
+14.20.1.c :: Total number of blood samples screened by ELISA/Rapid tests for viral hepatitis C(Anti- HCV)
+14.20.1.d :: Total number of blood samples screened by ELISA/Rapid tests for viral hepatitis E(i.e. IgM Anti-HEV)
+14.20.2.a :: Total number of blood samples tested positive by ELISA/ Rapid tests for Hepatitis A (out of those tested for IgM Anti- HAV)
+14.20.2.b :: Total number of blood samples tested positive by ELISA/ Rapid tests for Hepatitis B (out of those tested for HBsAg excluding pregnant women)
+14.20.2.b.i :: Total number of positive blood samples for hepatitis B by ELISA/ Rapid tests tested for HBV DNA(out of those tested positive for HBsAg excluding pregnant women)
+14.20.2.b.ii :: Total number of patients found positive for HBsAg eligible for treatment for hepatitis B (excluding pregnant women)
+14.20.2.b.iii :: Total number of patients eligible for treatment for Hepatitis B put on treatment(out of those eligible for treatment excluding pregnant women)
+14.20.2.c :: Total number of blood samples tested positive by ELISA/ Rapid tests for Hepatitis C (out of those tested for Anti-HCV)
+14.20.2.c.i :: Total number of positive blood samples for Hepatitis C screened by test (ELISA/ Rapid tests) confirmed by HCV RNA testing (out of those positive for anti-HCV)
+14.20.2.c.ii :: Total number of patients put on treatment for Hepatitis C (out of those confirmed by HCV RNA i.e. HCV RNA detected)
+14.20.2.c.iii :: Total number of positive Hepatitis C patients who have completed treatment
+14.20.2.c.iv :: Total number of patients cleared for HCV RNA on sustained virological response at 12 weeks (SVR12)
+14.20.2.d :: Total number of blood samples tested positive by ELISA/ Rapid tests for Hepatitis E(out of those tested for IgM Anti-HEV)
+14.20.3.a :: Number of Pregnant Women tested for HBsAg
+14.20.3.b :: Number of Pregnant Women who are HBsAg positive(out of those tested for Hepatitis B i.e. HBsAg)
+14.20.3.c :: Number of Pregnant Women found positive for HBsAg referred out to higher centre for institutional delivery
+14.20.3.d :: Number of Pregnant Women found positive for HBsAg delivered in an institution
+14.20.3.e :: Number of newborn who received birth dose of Hepatitis B vaccine born to HBsAg positive pregnant women
+14.20.3.f :: Number of New Borns to Pregnant Women (found positive for HBsAg) received Hepatitis B Immunoglobulin (HBIG) (within 24 hours of birth)
+15.1.1. :: Total Number of Lab Tests done- Inhouse (including kits tests conducted in Laboratory)
+15.1.2. :: Total Number of Lab Tests done- Outsourced (including kits tests conducted in Laboratory)
+15.1.3. :: Total Number of Kit Tests conducted in Outreach areas/Camps/in-facility(outside lab)
+15.2.1. :: Number of Hb tests conducted including kit tests
+15.2.2. :: Out of the total number of Hb tests done, Number having Hb < 7 mg
+15.3.1.a :: Number of males screened for HIV by Whole Blood Finger Prick/RDT test/POC test
+15.3.1.b :: Out of the above, No. of males found reactive for HIV
+15.3.1.c :: No. of males subjected to HIV test at Confirmatory Centre/Stand Alone-ICTC
+15.3.1.d :: Out of the above, No. of males confirmed as HIV Positive
+15.3.2.a :: Number of females (non-ANC) screened for HIV by Whole Blood Finger Prick/RDT test/POC test
+15.3.2.b :: Out of the above, No. of females (non-ANC) found reactive for HIV
+15.3.2.c :: No. of females (non-ANC) subjected to HIV test at Confirmatory Centre/Stand Alone-ICTC
+15.3.2.d :: Out of the above, No. of females (non-ANC) confirmed as HIV Positive
+15.3.3.a :: Number of Pregnant Women (PW-ANC) screened for HIV by Whole Blood Finger Prick/RDT test/POC test
+15.3.3.b :: Out of the above, No. of PW(ANC) found reactive for HIV
+15.3.3.c :: No. of PW(ANC) subjected to HIV test at Confirmatory Centre/Stand Alone-ICTC
+15.3.3.d :: Out of the above, No. of PW(ANC) confirmed as HIV Positive
+15.3.3.e :: Number of DIL women screened for HIV by Whole Blood Finger Prick/RDT test/POC test
+15.3.3.f :: Out of the above, No. of DIL women found reactive for HIV
+15.3.3.g :: No. of DIL women subjected to HIV test at Confirmatory Centre/Stand Alone-ICTC
+15.3.3.h :: Out of the above, No. of DIL women confirmed as HIV Positive
+15.3.3.i :: Number of Pregnant Women (ANC&DIL) screened for HIV more than once(Repeated testing)
+15.3.4.a :: Number of H/TG people screened for HIV by Whole Blood Finger Prick/RDT test/POC test
+15.3.4.b :: Out of the above, No. of H/TG people found reactive for HIV
+15.3.4.c :: No. of H/TG people subjected to HIV test at Confirmatory Centre/Stand Alone-ICTC
+15.3.4.d :: Out of the above, No. of H/TG people confirmed as HIV Positive
+15.4.1.a :: Total number of males tested for Syphilis (RPR/VDRL/PoC/ RDT/TPHA)
+15.4.1.b :: Out of the above, number of males tested reactive for Syphilis (RPR/VDRL/PoC/ RDT/TPHA)
+15.4.1.c :: Out of the above, number of males treated for Syphilis
+15.4.2.a :: Total number of female (non-ANC) tested for Syphilis (RPR/VDRL/PoC/ RDT/TPHA)
+15.4.2.b :: Out of the above, number of females (non-ANC) tested reactive for Syphilis (RPR/VDRL/PoC/ RDT/TPHA)
+15.4.2.c :: Out of the above, number of females (non-ANC) treated for Syphilis
+15.4.3.a :: Total number of H/TG people tested for Syphilis (RPR/VDRL/PoC/ RDT/TPHA)
+15.4.3.b :: Out of the above, number of H/TG people tested reactive for Syphilis (RPR/VDRL/PoC/ RDT/TPHA)
+15.4.3.c :: Out of the above, number of H/TG people treated for Syphilis
+15.5.1 :: Widal tests- Number Tested
+15.5.2 :: Widal tests- Number Positive
+15.6.1.a.i :: X-ray(Inhouse)
+15.6.1.a.i.1 :: X-ray(Inhouse)-No. of chest X-rays done on patients with health risks- Diabetes, HIV, Smoking, Alcoholism, low BMI, geriatric population (>60),history of TB, contacts of TB
+15.6.1.a.ii :: X-ray(Outsource)
+15.6.1.b.i :: Ultrasonography (USG) (Inhouse)
+15.6.1.b.ii :: Ultrasonography (USG)(Outsource)
+15.6.1.c.i :: CT scan (Inhouse)
+15.6.1.c.ii :: CT scan (Outsource)
+15.6.1.d.i :: MRI (Inhouse)
+15.6.1.d.ii :: MRI (Outsource)
+15.6.1.e.i :: ECG (Inhouse)
+15.6.1.e.ii :: ECG (Outsource)
+16.1.1a :: New born deaths within 24 hrs(1 to 23 Hrs 59 minutes) of birth at Facility/Facility to facility in transit
+16.1.1.b :: New born deaths within 24 hrs(1 to 23 Hrs 59 minutes) of birth in Community (at home or home to facility transit)
+16.1.2.a :: New born deaths within 1 week (1 to 7 days) at Facility/Facility to facility in transit
+16.1.2.b :: New born deaths within 1 week (1 to 7 days) At Community (at home or home to facility transit)
+16.1.3.a :: New born deaths within 8 to 28 days at Facility/Facility to facility in transit
+16.1.3.b :: New born deaths within 8 to 28 days At Community (at home or home to facility transit)
+16.1.4.a :: Infant Deaths (>28 days to below 12 months) at Facility/Facility to facility in transit
+16.1.4.b :: Infant Deaths (>28 days to below 12 months) At Community (at home or home to facility transit)
+16.2.1. :: Neonatal Deaths up to 4 weeks (0 to 28 days) due to Sepsis
+16.2.2. :: Neonatal Deaths up to 4 weeks (0 to 28 days) due to Asphyxia
+16.2.3. :: Neonatal Deaths up to 4 weeks (0 to 28 days) due to complications of Prematurity
+16.2.4. :: Neonatal Deaths up to 4 weeks (0 to 28 days) due to Other causes
+16.3.1. :: Number of Infant Deaths (>28 days - below 12 months) due to Pneumonia
+16.3.2. :: Number of Infant Deaths (>28 days - below 12 months) due to Diarrhoea
+16.3.3. :: Number of Infant Deaths (>28 days - below 12 months) due to Fever related
+16.3.4. :: Number of Infant Deaths (>28 days - below 12 months) due to Measles
+16.3.5. :: Number of Infant Deaths (>28 days - below 12 months) due to Others
+16.4.1. :: Number of Child Deaths (1 - below 5 years) due to Pneumonia
+16.4.2. :: Number of Child Deaths (1 - below 5 years) due to Diarrhoea
+16.4.3. :: Number of Child Deaths (1 - below 5 years) due to Fever related
+16.4.4. :: Number of Child Deaths (1 - below 5 years) due to Measles
+16.4.5. :: Number of Child Deaths (1 - below 5 years) due to Others
+16.5.1. :: Number of Maternal Deaths at facility due to APH (Antepartum Haemmorhage)
+16.5.2. :: Number of Maternal Deaths at facility due to PPH (Post-Partum Haemmorhage)
+16.5.3. :: Number of Maternal Deaths at facility due to Pregnancy related infection and sepsis, Fever
+16.5.4. :: Number of Maternal Deaths at facility due to Abortion and/ or its complication
+16.5.5. :: Number of Maternal Deaths at facility due to Obstructed/prolonged labour
+16.5.6. :: Number of Maternal Deaths at facility due to Severe hypertension/fits/Pre Eclampsia/Eclampsia in pregnancy, during delivery and puerperium
+16.5.7. :: Number of Maternal Deaths at facility due to Other/Unknown Causes
+16.5.8. :: Age wise total Maternal Deaths, occurred at Facility
+16.5.8.a :: Out of total number of maternal deaths at facility, deaths with age less than <15 years
+16.5.8.b :: Out of total number of maternal deaths at facility, deaths with age 15-19 years
+16.5.8.c :: Out of total number maternal deaths at facility, deaths with age more than >19-49 years
+16.5.8.d :: Out of total number maternal deaths at facility, deaths with age more than >49 years
+16.6. :: Total Facility Based Maternal Death Reviews (FBMDR) done
+16.7.1. :: Number of deaths due to Diarrhoeal diseases
+16.7.2. :: Number of deaths due to Tuberculosis
+16.7.3. :: Number of deaths due to Respiratory diseases including infections (other than TB)
+16.7.4. :: Number of deaths due to Other Fever Related
+16.7.5. :: Number of deaths due to Heart disease/Hypertension related
+16.7.6. :: Number of deaths due to Cancer
+16.7.7. :: Number of deaths due to Neurological disease including strokes
+16.7.8. :: Number of deaths due to Accidents/Burn cases
+16.7.9. :: Number of deaths due to Animal bites and stings
+16.7.10. :: Number of deaths due to Known Acute Disease
+16.7.11. :: Number of deaths due to Known Chronic Disease
+16.7.12. :: Number of deaths due to Other Causes
+16.8.1. :: Number of Deaths due to Malaria- Plasmodium Vivax
+16.8.2. :: Number of Deaths due to Malaria- Plasmodium Falciparum
+16.8.3. :: Number of Deaths due to Kala Azar
+16.8.4. :: Number of Deaths due to Dengue
+16.8.5. :: Number of Deaths due to Acute Encephelitis Syndrome (AES)
+16.8.6. :: Number of Deaths due to Japanese Encephalitis (JE)
+16.9. :: Total Deaths (5 years and above of age): Excluding in-transit & maternal deaths
+16.9.1. :: 5 years and above to below 10 years
+16.9.2. :: 10 year and above to below 19 years
+16.9.3. :: Adult 19 years and above
+16.10.1. :: In-transit Deaths: 1 year and below 5 years
+16.10.2. :: In-transit Deaths: 5 years and above to below 10 years
+16.10.3. :: In-transit Deaths: 10 year and above to below 19 years
+16.10.4. :: In-transit Deaths: Adult 19 years and above
+17.1.1. :: Total number of Haematology tests registered under External Quality Assurance Scheme (EQAS)
+17.1.2. :: No. of registered Haematology tests reported EQAS Compliant
+17.1.3. :: Total number of Biochemistry tests registered under External Quality Assurance Scheme (EQAS)
+17.1.4. :: No. of registered Bio chemistry tests report EQAS Compliant
+17.1.5. :: Total Quantity of Bio medical waste generated in Kg for the month - (All Yellow, Red, white & Blue)
+17.1.6. :: Total Quantity of General waste generated in Kg for the month
+17.2.1. :: Total number of breakdown calls reported for the month
+17.2.2. :: Total number of breakdown attended for the month
+17.2.3. :: Number of visit made by the service engineer/ BME for the month
