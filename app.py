@@ -1139,13 +1139,18 @@ with tab2:
                 if st.session_state.get('modal_anomaly_lock') != selected_val:
                     st.session_state['modal_anomaly_lock'] = selected_val
                     
-                    query = "SELECT * FROM hmis_master_data WHERE Financial_Year = ?"
-                    params = [financial_year]
-                    if selected_month != "All Months": query += " AND Month = ?"; params.append(selected_month)
-                    if selected_district != "All Districts": query += ' AND "District Name" = ?'; params.append(selected_district)
-                    if facility_code: query += ' AND "Facility Code" = ?'; params.append(facility_code)
+                    # --- THE DRIVE FIX: Pull from cloud cache instead of dead local DB ---
+                    raw_df_modal = get_cached_hmis_data(financial_year).copy()
                     
-                    raw_df_modal = con_data.execute(query, params).fetchdf()
+                    # Apply your global filters in pandas instead of SQL
+                    if not raw_df_modal.empty:
+                        if selected_month != "All Months": 
+                            raw_df_modal = raw_df_modal[raw_df_modal['Month'] == selected_month]
+                        if selected_district != "All Districts": 
+                            raw_df_modal = raw_df_modal[raw_df_modal['District Name'] == selected_district]
+                        if facility_code: 
+                            raw_df_modal = raw_df_modal[raw_df_modal['Facility Code'].astype(str) == str(facility_code)]
+                    
                     show_drilldown_modal(selected_val, raw_df_modal, financial_year, selected_month, selected_district, facility_code)
             else:
                 # Clear the lock if they unclick the row, so they can click it again later if they want
