@@ -1418,7 +1418,7 @@ if is_admin:
                 service = get_gdrive_service()
                 
                 # Stripping any accidental invisible spaces
-                folder_id = "1TK3CsZc_9xday99mbBYoLQCMBuVLrznQ".strip()
+                folder_id = "1TK3CsZc_9xday99mBbYoLQCMBuVLrznQ".strip()
                 
                 # 1. Search and delete (with forced visibility flags)
                 try:
