@@ -232,7 +232,7 @@ def init_data_db():
 def init_rules_db():
     con_rules = duckdb.connect("hmis_rules.duckdb")  
     
-    # Create the base table
+    # 1. Create the base table (9 columns)
     con_rules.execute("""
         CREATE TABLE IF NOT EXISTS rules_metadata_v3 (
             Category_Code VARCHAR, Rule_ID VARCHAR, Rule_Description VARCHAR,
@@ -241,17 +241,7 @@ def init_rules_db():
         )
     """)
     
-    # --- 🚀 THE STEP 3 FIX: AUTO-LOAD GITHUB BACKUP IF DATABASE IS EMPTY ---
-    count = con_rules.execute("SELECT COUNT(*) FROM rules_metadata_v3").fetchone()[0]
-    if count == 0 and os.path.exists("rules_backup.xlsx"):
-        try:
-            df_backup = pd.read_excel("rules_backup.xlsx", engine="openpyxl")
-            con_rules.execute("INSERT INTO rules_metadata_v3 SELECT * FROM df_backup")
-        except Exception as e:
-            pass # Fails cleanly if the Excel file is somehow corrupted
-    # -------------------------------------------------------------------------
-    
-    # --- STEP 1: DATABASE AUTO-MIGRATION FOR DIMENSIONS & MOM PATTERNS ---
+    # 2. BUILD THE FULL SCHEMA FIRST (Adds the 6 remaining columns)
     try:
         existing_cols = [row[1] for row in con_rules.execute("PRAGMA table_info('rules_metadata_v3')").fetchall()]
         schema_additions = {
@@ -268,7 +258,46 @@ def init_rules_db():
     except Exception as e:
         pass
         
-    # Create table for secure admin settings
+    # 3. NOW LOAD THE GITHUB EXCEL FILE (Smartly handling missing columns)
+    count = con_rules.execute("SELECT COUNT(*) FROM rules_metadata_v3").fetchone()[0]
+    if count == 0 and os.path.exists("rules_backup.xlsx"):
+        try:
+            df_backup = pd.read_excel("rules_backup.xlsx", engine="openpyxl")
+            
+            # Define the exact 15 columns the database needs, with safe fallback values
+            expected_cols = {
+                "Category_Code": "M1", 
+                "Rule_ID": "0", 
+                "Rule_Description": "",
+                "Target_Format": "All Formats", 
+                "Rule_Type": "Math", 
+                "Logic_LHS": "", 
+                "Operator": "=", 
+                "Logic_RHS": "", 
+                "Show_Difference": True,
+                "Rule_Category": "Single Month",
+                "Trend_Pattern": "None",
+                "PHC_Area_Scope": "All",
+                "Non_PHC_Ownership": "All",
+                "Trend_Window_Months": 3,
+                "Trend_Threshold": 3.0
+            }
+            
+            # If the Excel file is missing a column (like PHC_Area_Scope), add it automatically
+            for col, default_val in expected_cols.items():
+                if col not in df_backup.columns:
+                    df_backup[col] = default_val
+                    
+            # Lock the columns into the exact order the database expects
+            df_backup = df_backup[list(expected_cols.keys())]
+            
+            # Safely insert the upgraded data
+            con_rules.execute("INSERT INTO rules_metadata_v3 SELECT * FROM df_backup")
+        except Exception as e:
+            print(f"Error loading backup: {e}") 
+            pass 
+            
+    # 4. Create table for secure admin settings
     con_rules.execute("""
         CREATE TABLE IF NOT EXISTS admin_settings (
             setting_name VARCHAR, setting_value VARCHAR
