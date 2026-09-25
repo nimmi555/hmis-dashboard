@@ -467,7 +467,7 @@ financial_year = st.sidebar.selectbox("Financial Year", ["2026-27"])
 
 # Extract dynamic lists directly from the Cloud DataFrame
 try:
-    master_df = get_cached_hmis_data(financial_year)
+    master_df = get_filtered_hmis_data(financial_year)
     if not master_df.empty:
         db_months = master_df['Month'].dropna().unique().tolist()
         
@@ -520,7 +520,7 @@ def run_anomaly_engine(sel_fy, sel_month, sel_dist, fac_code):
     import pandas as pd
     
     # 1. Pull from the blazing fast memory cache instead of hitting the database!
-    full_fy_df = get_cached_hmis_data(sel_fy)
+    full_fy_df = get_filtered_hmis_data(sel_fy)
     rules_df = get_cached_rules()
     
     if full_fy_df.empty or rules_df.empty:
@@ -653,7 +653,7 @@ st.write("") # spacer
 def run_trend_engine(sel_fy, sel_dist, fac_code):
     import pandas as pd
     
-    full_fy_df = get_cached_hmis_data(sel_fy).copy()
+    full_fy_df = get_filtered_hmis_data(sel_fy).copy()
     rules_df = get_cached_rules()
     
     if full_fy_df.empty or rules_df.empty:
@@ -1155,7 +1155,7 @@ with tab2:
                     st.session_state['modal_anomaly_lock'] = selected_val
                     
                     # --- THE DRIVE FIX: Pull from cloud cache instead of dead local DB ---
-                    raw_df_modal = get_cached_hmis_data(financial_year).copy()
+                    raw_df_modal = get_filtered_hmis_data(financial_year).copy()
                     
                     # Apply your global filters in pandas instead of SQL
                     if not raw_df_modal.empty:
