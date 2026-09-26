@@ -13,7 +13,7 @@ from googleapiclient.http import MediaIoBaseUpload
 from github import Github
 
 # 1. PAGE CONFIGURATION (Must be the absolute first Streamlit command)
-st.set_page_config(page_title="HMIS Anomalies", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="AP HMIS Anomaly Engine", page_icon="🏥", layout="wide", initial_sidebar_state="expanded")
 
 # 3. CACHING FUNCTION & DATA LOADING (Moved safely below the page config)
 @st.cache_data
@@ -521,6 +521,9 @@ else:
 
 # --- MASTER EXECUTION ENGINE: REAL DATA BINDING ---
 def run_anomaly_engine(sel_fy, sel_month, sel_dist, fac_code):
+    import gc
+    gc.collect() # 🧹 FORCE PYTHON TO DUMP OLD MEMORY BEFORE RUNNING!
+    
     import re
     import pandas as pd
     
@@ -656,6 +659,9 @@ st.write("") # spacer
 
 # --- MoM TREND EXECUTION ENGINE ---
 def run_trend_engine(sel_fy, sel_dist, fac_code):
+    import gc
+    gc.collect() # 🧹 FORCE PYTHON TO DUMP OLD MEMORY BEFORE RUNNING!
+    
     import pandas as pd
     
     full_fy_df = get_filtered_hmis_data(sel_fy).copy()
@@ -1160,7 +1166,7 @@ with tab2:
                     st.session_state['modal_anomaly_lock'] = selected_val
                     
                     # --- THE DRIVE FIX: Pull from cloud cache instead of dead local DB ---
-                    raw_df_modal = get_filtered_hmis_data(financial_year).copy()
+                    raw_df_modal = get_filtered_hmis_data(financial_year)
                     
                     # Apply your global filters in pandas instead of SQL
                     if not raw_df_modal.empty:
