@@ -175,21 +175,16 @@ def get_cached_rules():
 # =====================================================================
 @st.cache_data(ttl=600, show_spinner="Fetching data from Google Drive...")
 def get_cached_hmis_data(sel_fy):
-    """Downloads HMIS files using dynamic PyArrow column pruning to prevent OOM."""
+    """Downloads HMIS files using PyArrow (Column pruning removed for safety)."""
+    import pandas as pd
+    import io
     from googleapiclient.http import MediaIoBaseDownload
     
-    # 1. DYNAMIC COLUMN PRUNING: Only load columns needed by active rules
-    rules_df = get_cached_rules()
-    required_cols = {"Month", "District Name", "Format Type", "Facility Code", "Facility Name", "Rural/Urban", "Ownership"}
-    
-    if not rules_df.empty:
-        for _, row in rules_df.iterrows():
-            metrics = re.findall(r'\[(.*?)\]', str(row.get('Logic_LHS', '')) + " " + str(row.get('Logic_RHS', '')))
-            required_cols.update(metrics)
-            
     try:
         service = get_gdrive_service()
+        # Your specific HMIS_Master_Data folder ID
         folder_id = "1TK3CsZc_9xday99mBbYoLQCMBuVLrznQ"
+        
         query = f"'{folder_id}' in parents and name contains 'HMIS_Data_{sel_fy}' and trashed=false"
         results = service.files().list(q=query, fields="files(id, name)", includeItemsFromAllDrives=True, supportsAllDrives=True).execute()
         items = results.get('files', [])
@@ -208,14 +203,9 @@ def get_cached_hmis_data(sel_fy):
                 status, done = downloader.next_chunk()
             file_buffer.seek(0)
             
-            # 2. PYARROW BACKEND + USECOLS LIMITER
+            # PYARROW BACKEND: Reads all columns safely without strict filtering
             try:
-                df = pd.read_csv(
-                    file_buffer, 
-                    engine="pyarrow", 
-                    dtype_backend="pyarrow", 
-                    usecols=lambda c: c in required_cols # Safely skips unused columns
-                )
+                df = pd.read_csv(file_buffer, engine="pyarrow", dtype_backend="pyarrow")
                 if not df.empty:
                     all_dataframes.append(df)
             except Exception:
@@ -244,7 +234,7 @@ def get_filtered_hmis_data(sel_fy):
             raw_df = raw_df[~raw_df['Month'].isin(disabled_list)]
     except Exception:
         pass 
-        
+
     return raw_df
 
 # =====================================================================
