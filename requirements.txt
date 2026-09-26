@@ -45,3 +45,4 @@ PyGithub
 openpyxl
 google-api-python-client
 google-auth
+pyarrow
