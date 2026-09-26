@@ -419,7 +419,7 @@ def get_cached_hmis_data(sel_fy):
                 df = pd.read_csv(file_buffer, engine="pyarrow")
                 if not df.empty:
                     all_dataframes.append(df)
-            except pd.errors.EmptyDataError:
+            except Exception:
                 pass 
                 
         # Stitch all the months together into one master table
