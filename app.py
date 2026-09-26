@@ -416,7 +416,7 @@ def get_cached_hmis_data(sel_fy):
             # Read the bytes into pandas
             try:
                 # Safely parse the CSV and ignore any blank placeholder files
-                df = pd.read_csv(file_buffer)
+                df = pd.read_csv(file_buffer, engine="pyarrow")
                 if not df.empty:
                     all_dataframes.append(df)
             except pd.errors.EmptyDataError:
